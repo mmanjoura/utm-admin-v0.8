@@ -32,31 +32,31 @@ var AppActions = {
       uuid: uuid
     })
   },
-  setCommissioning: function(uuid){
+  setTrafficTest: function(uuid){
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_TRAFFIC_TEST,
       uuid: uuid
     })
   },
-  setCommissioning: function(uuid){
+  setStandardTrx: function(uuid){
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_STANDARD_TRX,
       uuid: uuid
     })
   },
-  setCommissioning: function(uuid){
+  setHeartBeat: function(uuid){
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_HEARTBEAT,
       uuid: uuid
     })
   },
-  setCommissioning: function(uuid){
+  setReportingInterval: function(uuid){
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_REPORTING_INTERVAL,
       uuid: uuid
     })
   },
-  setCommissioning: function(uuid){
+  reboot: function(uuid){
     AppDispatcher.handleViewAction({
       actionType: AppConstants.REBOOT,
       uuid: uuid

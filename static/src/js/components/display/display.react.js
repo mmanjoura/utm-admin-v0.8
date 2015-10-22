@@ -9,88 +9,41 @@ var Hint = require('../panels/hint.react')
 var Measurements = require('../panels/measurements.react')
 var Link = require('react-router-component').Link
 
+function getUtmsData(){
+  return { utmsData: AppStore.getUtmsData()}
+}
+
 var Display = React.createClass({
 
   getInitialState: function(){   
-
-      var state = {
-
-        "Connection": {},
-        "LatestGpsPosition": {},
-        "LatestLclPosition": {},
-        "LatestLclPositionDisplay": {},
-        "LatestRssi": {},
-        "LatestRssiDisplay": {},
-        "LatestPowerState": {},
-        "LatestPowerStateDisplay": {},
-        "LatestDataVolume": {},
-        "LatestDisplayRow": {},
-        "Device_Setting" : {}
-    
-    };
-
-    if (window.location.hash == "#debug") {
-      state.json = JSON.stringify(state, null, "  ");
-    } else {
-      state.json = "";
-    }
-    return state;
-
-      return state;
+    return getUtmsData();
   },
 
-
-  componentDidMount: function() {
-    pollState(function(state) {
-      // fixup missing state properties to avoid muliple levels of missing attribute tests
-      [
-        "Connection",
-        "LatestRssi",
-        "LatestRssiDisplay",
-        "LatestPowerState",
-        "LatestPowerStateDisplay",
-        "LatestDataVolume",
-        "InitIndUlMsg",
-        "LatestPollIndUlMsg",
-        "LatestTrafficReportIndUlMsg",
-        "LatestDisplayRow"
-      ].map(function(property) {
-        if (!state[property]) {
-          state[property] = {};
-        }
-      });
-
-      if (window.location.hash == "#debug") {
-        state.json = JSON.stringify(state, null, "  ");
-      } else {
-        state.json = "";
-      }
-      this.setState(state);
-    }.bind(this), 10000);
-
-  },
-
-  /**
-   * @return {object}
-   */
   render: function() {
-
+    var utmsData = this.state.utmData.map(function(utmData){
+      <tr>
+        <td>utmData["Uuid"]</td>
+        <td>utmData["Mode"]</td>
+        <td>utmData["UnitName"]</td>
+        <td>utmData["UTotalMsgs"]</td>
+        <td>utmData["UTotalMsgs"]</td>
+         <td>utmData["UTotalMsgs"]</td>d>
+      </tr>
+    })
     return (
-
-
-      <div>
-           <div>
-              <Link href="/home">View Sample App</Link>
+            <div>
+              <div>
+                <Link href="/home">View Sample App</Link>
+              </div>
+                <div className="row"><br />
+                  <Configure />
+                  <Summary />
+                  <Hint />
+                </div>
+              <div className="row">
+                <Measurements />
+              </div>
             </div>
-        <div className="row"><br />
-          <Configure />
-          <Summary />
-          <Hint />
-        </div>
-        <div className="row">
-              <Measurements />
-        </div>
-      </div>
   
     );
   }

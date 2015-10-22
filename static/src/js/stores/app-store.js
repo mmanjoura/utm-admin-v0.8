@@ -5,6 +5,39 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = 'change';
 
+pollState(function(state) {
+
+  [
+    "Connection",
+    "LatestRssi",
+    "LatestRssiDisplay",
+    "LatestPowerState",
+    "LatestPowerStateDisplay",
+    "LatestDataVolume",
+    "InitIndUlMsg",
+    "LatestPollIndUlMsg",
+    "LatestTrafficReportIndUlMsg",
+    "LatestDisplayRow"
+  ].map(function(property) {
+    if (!state[property]) {
+      state[property] = {};
+    }
+  });
+
+  if (window.location.hash == "#debug") {
+    state.json = JSON.stringify(state, null, "  ");
+  } else {
+    state.json = "";
+  }
+  this.setState(state);
+}.bind(this), 10000);
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+
 var _catalog = [];
 
 for(var i=1; i<9; i++){
@@ -62,6 +95,21 @@ function _cartTotals(){
   return {'qty': qty, 'total': total};
 }
 
+function _setCommissioning(uuid){
+}
+function _setTrafficTest(uuid){
+}
+function _setStandardTrx(uuid){
+}
+function _setHeartBeat(uuid){
+}
+function _setReportingInterval(uuid){
+}
+function _reboot(uuid){
+}
+
+
+
 var AppStore = assign(EventEmitter.prototype, {
   emitChange: function(){
     this.emit(CHANGE_EVENT)
@@ -87,6 +135,11 @@ var AppStore = assign(EventEmitter.prototype, {
     return _cartTotals()
   },
 
+  getUtmsData: function(){
+    return state
+  },
+
+
   dispatcherIndex: AppDispatcher.register(function(payload){
     var action = payload.action; // this is our action from handleViewAction
     switch(action.actionType){
@@ -105,6 +158,25 @@ var AppStore = assign(EventEmitter.prototype, {
       case AppConstants.DECREASE_ITEM:
         _decreaseItem(payload.action.index);
         break;
+
+      case AppConstants.SET_COMMISSIONING:
+        _setCommissioning(payload.action.index);
+        break;
+      case AppConstants.SET_TRAFFIC_TEST:
+        _setTrafficTest(payload.action.index);
+        break;
+      case AppConstants.SET_STANDARD_TRX:
+        _setStandardTrx(payload.action.index);
+        break;
+      case AppConstants.SET_HEARTBEAT:
+        _setHeartBeat(payload.action.index);
+        break;
+      case AppConstants.SET_REPORTING_INTERVAL:
+        _setReportingInterval(payload.action.index);
+        break;
+      case AppConstants.REBOOT:
+        reboot(payload.action.index);
+        break;
     }
 
     AppStore.emitChange();
@@ -115,3 +187,39 @@ var AppStore = assign(EventEmitter.prototype, {
 })
 
 module.exports = AppStore;
+
+function pollState(updateState) {
+  function pollLoop() {
+    var x = new XMLHttpRequest();
+    x.onreadystatechange = function() {
+      if (x.readyState == 4) {
+        if (x.status == 200) {
+          var state = JSON.parse(x.responseText);
+         
+          updateState(state);
+        }
+        window.setTimeout(pollLoop, 1000);
+      }
+    };
+
+    x.open("GET", "latestState", true);
+    x.send();
+  }
+  pollLoop();
+}
+
+
+var state = {
+
+  "Connection": {},
+  "LatestGpsPosition": {},
+  "LatestLclPosition": {},
+  "LatestLclPositionDisplay": {},
+  "LatestRssi": {},
+  "LatestRssiDisplay": {},
+  "LatestPowerState": {},
+  "LatestPowerStateDisplay": {},
+  "LatestDataVolume": {},
+  "LatestDisplayRow": {}
+};
+
