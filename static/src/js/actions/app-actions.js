@@ -25,6 +25,42 @@ var AppActions = {
       actionType: AppConstants.DECREASE_ITEM,
       index: index
     })
+  },
+  setCommissioning: function(uuid){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_COMMISSIONING,
+      uuid: uuid
+    })
+  },
+  setCommissioning: function(uuid){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_TRAFFIC_TEST,
+      uuid: uuid
+    })
+  },
+  setCommissioning: function(uuid){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_STANDARD_TRX,
+      uuid: uuid
+    })
+  },
+  setCommissioning: function(uuid){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_HEARTBEAT,
+      uuid: uuid
+    })
+  },
+  setCommissioning: function(uuid){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_REPORTING_INTERVAL,
+      uuid: uuid
+    })
+  },
+  setCommissioning: function(uuid){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.REBOOT,
+      uuid: uuid
+    })
   }
 }
 

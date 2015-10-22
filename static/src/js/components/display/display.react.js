@@ -7,7 +7,7 @@ var Configure = require('../panels/configure.react')
 var Summary = require('../panels/summary.react')
 var Hint = require('../panels/hint.react')
 var Measurements = require('../panels/measurements.react')
-
+var Link = require('react-router-component').Link
 
 var Display = React.createClass({
 
@@ -77,7 +77,11 @@ var Display = React.createClass({
 
     return (
 
+
       <div>
+           <div>
+              <Link href="/home">View Sample App</Link>
+            </div>
         <div className="row"><br />
           <Configure />
           <Summary />

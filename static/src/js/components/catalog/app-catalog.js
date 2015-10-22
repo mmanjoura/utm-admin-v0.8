@@ -3,6 +3,7 @@ var AppStore = require('../../stores/app-store.js');
 var AddToCart = require('./app-addtocart.js')
 var StoreWatchMixin = require('../../mixins/StoreWatchMixin');
 var CatalogItem = require('../catalog/app-catalogitem');
+var Cart = require('../cart/app-cart');
 
 
 function getCatalog(){
@@ -17,8 +18,13 @@ var Catalog = React.createClass({
 
     })
     return (
-      <div className="row">
-        {items}
+      <div>
+        <div className="row">
+          <Cart />
+        </div>
+        <div className="row">
+          {items}
+        </div>
       </div>
     )
   }
