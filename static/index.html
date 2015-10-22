@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UTM-WEB</title>
+  <link rel="stylesheet" media="screen" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <!-- The mobile navbar-toggle button can be safely removed since you do not need it in a non-responsive implementation -->
+           <a class="brand " href="#/utmlist">
+                <img src="static/assets/images/logo.png" alt="u-blox" style = "max-width: 130px; padding:5px">
+            </a>
+        </div>
+        <!-- Note that the .navbar-collapse and .collapse classes have been removed from the #navbar -->
+        <div id="navbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#/mode">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+ </nav>
+
+<div id="main" class="container"></div>
+
+ <div id="footer">
+    <div class="navbar navbar-fixed-bottom">
+        <div class="navbar-inner">
+            <div class="container">
+                <footer>
+                    <div class="row">
+                      <p class="text-center"><small>&copy; 2015 u-blox Ltd</small></p>
+                    </div>
+               </footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="main" class="container"></div>
+<script src="static/dist/js/main.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" />
+</body>
+</html>
+
+<script>
+$(document).ready(function() {
+$('#dataTables-example').DataTable({
+        responsive: true
+});
+
+$(".sidebar").hide();
+$('#page-wrapper').css({'margin-left':'0px'});
+});
+
+
+</script>
