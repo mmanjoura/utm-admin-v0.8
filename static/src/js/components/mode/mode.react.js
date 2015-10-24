@@ -3,60 +3,9 @@
  * All rights reserved.
  */
 var React = require('react');
+var Setting = require('../controls/setting.react');
 
 var Mode = React.createClass({
-
-  getInitialState: function(){   
-
-      var state = {
-
-        "Connection": {},
-        "LatestGpsPosition": {},
-        "LatestLclPosition": {},
-        "LatestLclPositionDisplay": {},
-        "LatestRssi": {},
-        "LatestRssiDisplay": {},
-        "LatestPowerState": {},
-        "LatestPowerStateDisplay": {},
-        "LatestDataVolume": {},
-        "LatestDisplayRow": {},
-        "Device_Setting" : {}
-    
-    };
-
-      return state;
-  },
-
-  componentDidMount: function() {
-    pollState(function(state) {
-      // fixup missing state properties to avoid muliple levels of missing attribute tests
-      [
-        "Connection",
-        "LatestRssi",
-        "LatestRssiDisplay",
-        "LatestPowerState",
-        "LatestPowerStateDisplay",
-        "LatestDataVolume",
-        "InitIndUlMsg",
-        "LatestPollIndUlMsg",
-        "LatestTrafficReportIndUlMsg",
-        "LatestDisplayRow"
-      ].map(function(property) {
-        if (!state[property]) {
-          state[property] = {};
-        }
-      });
-
-      if (window.location.hash == "#debug") {
-        state.json = JSON.stringify(state, null, "  ");
-      } else {
-        state.json = "";
-      }
-      this.setState(state);
-    }.bind(this), 10000);
-
-  },
-
 
   /**
    * @return {object}
@@ -65,32 +14,38 @@ var Mode = React.createClass({
    
        return (
 
-      <div className="row"><br />
-        <div className="col-lg-4">
-          {/* Device Setting */}
-          <div className="panel panel-info" style={{height: 100}}>
-            <div className="panel-body">
-              <p>
-                <b>Add or Remove more UEs</b>
-              </p><div>
-                {/* Note the missing multiple attribute! */}
-                <select id="example-multiple-selected" multiple="multiple">
+      <div className="row" ><br />
+    
+ 
+        <div className="col-lg-8" style={{width:'400px', height: '180px'}}>
+          <div className="panel panel-info">
+            <div className="panel-body" style={{width:'400px', height: '180px'}}>
+             <div style={{float:'left'}}>
+                <select id="example-multiple-selected" multiple="multiple" style={{width:'110px', height: '150px'}}>
                   <option value={1}>UE-P</option>
                   <option value={2} selected="selected">UE-TW</option>
-                  {/* Option 3 will be selected in advance ... */}
-                  <option value={3}>UE-WW</option>
+                   <option value={3}>UE-WW</option>
                   <option value={4}>UE-T</option>
                   <option value={5}>UE-R</option>
                   <option value={6}>UE-E</option>
                 </select>
               </div>
+
+              <div style={{float:'right', marginRight:'30px'}}>
+                <Setting />
+              </div>
               <p />
             </div>
           </div>
         </div> 
+        <div className="col-lg-4">
+        </div>
         <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-info">
+        <div className="collg-4">
+        </div>
+          <div className="col-lg-12" style={{marginTop:'10px'}}>
+         
+            <div className="panel panel-info" >
               <div className="panel-heading">
                 Operating Modes
               </div>
@@ -332,8 +287,9 @@ var Mode = React.createClass({
               {/* /.panel-body */}
             </div>
             {/* /.panel */}
-          </div>
+            </div>
         </div>
+
       </div>
     );
 

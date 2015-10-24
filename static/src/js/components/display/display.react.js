@@ -77,7 +77,7 @@ var Display = React.createClass({
     return (
       <div className="row">
       <div>
-        <div className="row"><br /><br /><br />
+        <div className="row"><br />
          <Configure />
           {/* /.col-lg-4 */} 
           <div className="col-lg-4">
@@ -96,9 +96,9 @@ var Display = React.createClass({
           {/* /.col-lg-12 */}
         </div>
         {/* /.row */}
-        <div className="row">
-          <div className="panel panel-default">
-            <div className="panel-heading">
+        <div className="row" >
+          <div className="panel panel-default" >
+            <div className="_panel-heading" style={{width:'100%'}}>
               {/* /.panel-heading */}
               <div className="panel-body">
                 <div className="dataTable_wrapper">
@@ -226,8 +226,6 @@ function pollState(updateState) {
   }
   pollLoop();
 }
-
-
 
 module.exports = Display;
 
