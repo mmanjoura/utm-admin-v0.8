@@ -18,7 +18,7 @@ var Display = React.createClass({
 
     getInitialState: function(){   
 
-      var state = {
+      var data = {
 
         "Connection": {},
         "LatestGpsPosition": {},
@@ -35,16 +35,16 @@ var Display = React.createClass({
     };
 
     if (window.location.hash == "#debug") {
-      state.json = JSON.stringify(state, null, "  ");
+      data.json = JSON.stringify(data, null, "  ");
     } else {
-      state.json = "";
+      data.json = "";
     }
-    return state;
+    return data;
 
-      return state;
+      return data;
   },
   componentDidMount: function() {
-    pollState(function(state) {
+    pollState(function(data) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
       [
         "Connection",
@@ -58,17 +58,17 @@ var Display = React.createClass({
         "LatestTrafficReportIndUlMsg",
         "LatestDisplayRow"
       ].map(function(property) {
-        if (!state[property]) {
-          state[property] = {};
+        if (!data[property]) {
+          data[property] = {};
         }
       });
 
       if (window.location.hash == "#debug") {
-        state.json = JSON.stringify(state, null, "  ");
+        data.json = JSON.stringify(data, null, "  ");
       } else {
-        state.json = "";
+        data.json = "";
       }
-      this.setState(state);
+      this.setState(data);
     }.bind(this), 10000);
   },
 
@@ -213,9 +213,9 @@ function pollState(updateState) {
     x.onreadystatechange = function() {
       if (x.readyState == 4) {
         if (x.status == 200) {
-          var state = JSON.parse(x.responseText);
+          var data = JSON.parse(x.responseText);
          
-          updateState(state);
+          updateState(data);
         }
         window.setTimeout(pollLoop, 1000);
       }
