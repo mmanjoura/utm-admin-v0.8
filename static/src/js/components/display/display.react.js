@@ -13,9 +13,10 @@ var DisplayRow = require('./displayRow.react')
 
 var Link = require('react-router-component').Link
 
+
 var Display = React.createClass({
 
-  getInitialState: function(){   
+    getInitialState: function(){   
 
       var state = {
 
@@ -42,8 +43,6 @@ var Display = React.createClass({
 
       return state;
   },
-
-
   componentDidMount: function() {
     pollState(function(state) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
@@ -71,30 +70,15 @@ var Display = React.createClass({
       }
       this.setState(state);
     }.bind(this), 10000);
-
-
-
   },
 
-  /**
-   * @return {object}
-   */
-  render: function() {
+  render:function(){
 
     return (
-
+      <div className="row">
       <div>
-        <div className="row"><br />
-          <div className="col-lg-4">
-           {this.state.json}
-            {/* Device Setting */}
-            <div className="panel" style={{height: 60, width: 180, marginTop: 100}}>
-              <div className="panel-body"><p>
-                  <a tabIndex={-1} href="#/standard"> <b className="fa fa-cogs  fa-2x" /></a> <b style={{float: 'right'}}>Configure Ticked</b><br />
-                </p>
-              </div>
-            </div>
-          </div> 
+        <div className="row"><br /><br /><br />
+         <Configure />
           {/* /.col-lg-4 */} 
           <div className="col-lg-4">
             {/* TrxSummary */}
@@ -108,19 +92,7 @@ var Display = React.createClass({
               </div>
             </div>
           </div>
-          <div className="col-lg-4">
-            {/* Hint */}
-            <div className="panel panel-info" style={{height: 110, width: 300}}>
-              <div className="panel-body">
-                <p>
-                  
-                    There are more options / setting for individual UTM. They can be access through the following icon 
-                   <b className="fa fa-cogs" /> in the table below.
-                  
-                </p>
-              </div>
-            </div>
-          </div>
+        <Hint />
           {/* /.col-lg-12 */}
         </div>
         {/* /.row */}
@@ -221,10 +193,8 @@ var Display = React.createClass({
           {/* /.col-lg-12 */}
         </div>
       </div>
-    );
-
-
-
+      </div>
+    )
   }
 });
 
@@ -260,4 +230,6 @@ function pollState(updateState) {
 
 
 module.exports = Display;
+
+
 

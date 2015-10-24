@@ -9,7 +9,7 @@ var Hint = React.createClass({
               <div className="panel-body">
                 <p>                  
                     There are more options / setting for individual UTM. They can be access through the following icon 
-                   <b className="fa fa-cogs" /> in the table below.                  
+                   &nbsp;<b className="fa fa-cogs" /> in the table below.                  
                 </p>
               </div>
             </div>

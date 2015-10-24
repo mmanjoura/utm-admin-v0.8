@@ -1,17 +1,22 @@
 var React = require('react');
 var Setting = require('./controls/setting.react');
+var Header = require('./Header/Header.react')
 
 
 var Template = React.createClass({
 
 	render:function(){
-	return (
-	  <div className="container">
-	  {/*<Setting />*/}
+		return (
+		<div>
+		  <Header />
 	
-	    {this.props.children}
-	  </div>
-	);
+		  {/*<Setting />*/}
+		
+		    {this.props.children}
+	
+		 </div>
+		);
+		
 	}
 });
 
