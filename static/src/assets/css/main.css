@@ -69,3 +69,20 @@
 	color: #ff0000;
 }
 
+.ScrolledContent{
+	height: 200px; 
+  	overflow: hidden;
+	background:##f8f8f8;
+	color: #FFFFFF;
+ }
+
+ .ScrolledContent:hover{
+	height: 200px; 
+  	overflow: scroll;
+	background:#000000;
+	color: #FFFFFF;
+	float:right;
+	margin-left: 300px;
+ }
+
+

@@ -14,9 +14,7 @@ var Mode = React.createClass({
    
        return (
 
-      <div className="row" ><br />
-    
- 
+      <div className="row" ><br /> 
         <div className="col-lg-8" style={{width:'400px', height: '180px'}}>
           <div className="panel panel-info">
             <div className="panel-body" style={{width:'400px', height: '180px'}}>
@@ -39,6 +37,11 @@ var Mode = React.createClass({
           </div>
         </div> 
         <div className="col-lg-4">
+
+              <div className="ScrolledContent" style={{float:'right', width:'300px', height:'100px'}}>
+    a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a
+              </div>
+
         </div>
         <div className="row">
         <div className="collg-4">
