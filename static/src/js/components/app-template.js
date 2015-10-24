@@ -7,7 +7,7 @@ var Template = React.createClass({
 	render:function(){
 	return (
 	  <div className="container">
-	  <Setting />
+	  {/*<Setting />*/}
 	
 	    {this.props.children}
 	  </div>
