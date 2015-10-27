@@ -3,11 +3,11 @@
 package server
 
 import (
-	"fmt"
-	"log"
-
 	"encoding/json"
+	"fmt"
+	"github.com/brettlangdon/forge"
 	"github.com/mmanjoura/utm-admin-v0.8/service/utilities"
+	"log"
 	"net/http"
 	//"os"
 
@@ -89,11 +89,23 @@ func setReportingInterval(response http.ResponseWriter, request *http.Request) *
 }
 
 func processAmqp() {
+
+	settings, err := forge.ParseFile("config.cfg")
+	if err != nil {
+		panic(err)
+	}
+
+	amqp, err := settings.GetSection("amqp")
+
+	username, err := amqp.GetString("uname")
+	amqpAddress, err := amqp.GetString("amqp_address")
+	//ueGuid, err := amqp.GetString("ueguid")
+
 	// create a queue and bind it with relevant routing keys
-	amqpAddress := utilities.EnvStr("AMQP_ADDRESS")
-	username := utilities.EnvStr("UNAME")
-	//username := "neul@meades.org"
-	ueGuid = utilities.EnvStr("UEGUID")
+	// amqpAddress := utilities.EnvStr("AMQP_ADDRESS")
+	// username := utilities.EnvStr("UNAME")
+	// ueGuid = utilities.EnvStr("UEGUID")
+
 	q, err := OpenQueue(username, amqpAddress)
 
 	failOnError(err, "Queue")
