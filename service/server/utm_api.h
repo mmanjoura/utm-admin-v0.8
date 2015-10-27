@@ -55,6 +55,10 @@ extern "C" {
 // THIS MUST BE ZERO.
 #define TRANSPARENT_DATAGRAM_ID 0
 
+/// Ping request/confirm ID.
+#define PING_REQ_MSG_ID 1
+#define PING_CNF_MSG_ID 2
+
 // ----------------------------------------------------------------
 // PUBLIC FUNCTIONS
 // ----------------------------------------------------------------
@@ -70,6 +74,8 @@ typedef enum MsgIdDlTag_t
                                                        //! can only appear at the start of
                                                        //! a datagram.  The whole datagram
                                                        //! is passed on transparently.
+    PING_REQ_DL_MSG = PING_REQ_MSG_ID,                 //!< A ping request.
+    PING_CNF_DL_MSG = PING_CNF_MSG_ID,                 //!< A ping confirm.
     REBOOT_REQ_DL_MSG,                                 //!< Reboot the UTM.
     DATE_TIME_SET_REQ_DL_MSG,                          //!< Set the date/time on the UTM.
     DATE_TIME_GET_REQ_DL_MSG,                          //!< Get the date/time from the UTM.
@@ -109,6 +115,8 @@ typedef enum MsgIdUlTag_t
                                                        //! can only appear at the start of
                                                        //! a datagram.  The whole datagram
                                                        //! is passed on transparently.
+    PING_REQ_UL_MSG = PING_REQ_MSG_ID,                 //!< A ping request.
+    PING_CNF_UL_MSG = PING_CNF_MSG_ID,                 //!< A ping confirm.
     INIT_IND_UL_MSG,                                   //!< Power on of the UTM has completed.
     POLL_IND_UL_MSG,                                   //!< A poll message, sent on expiry of a
                                                        //! reporting period.
@@ -153,19 +161,45 @@ typedef enum MsgIdUlTag_t
 
 /// Encode a transparent message.  This occupies an entire
 // datagram, rather than the usual shorter message length,
-// and the contents are a flat array.
+// and the contents are a flat array.  Note that it does NOT
+// include a checksum, any validation of the contents is
+// up to the application.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_DATAGRAM_SIZE_RAW long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTransparentDatagram (char * pBuffer,
                                     TransparentDatagram_t * pDatagram,
-                                    char * pLog,
-                                    uint32_t logSize);
+                                    char ** ppLog,
+                                    uint32_t * pLogSize);
+
+/// Encode a ping request message.
+// \param pBuffer  A pointer to the buffer to encode into.  The
+// buffer length must be at least MAX_MESSAGE_SIZE long
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
+// to write an XML log of the encoded message.
+// \param ppLogSize  Optional pointer to the size of the log buffer.
+// Should be present if pLog is present.
+// \return  The number of bytes encoded.
+uint32_t encodePingReqMsg (char * pBuffer,
+                           char ** ppLog,
+                           uint32_t * pLogSize);
+
+/// Encode a ping confirm message, sent in response to a ping request.
+// \param pBuffer  A pointer to the buffer to encode into.  The
+// buffer length must be at least MAX_MESSAGE_SIZE long
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
+// to write an XML log of the encoded message.
+// \param pLogSize  Optional pointer to the size of the log buffer.
+// Should be present if pLog is present.
+// \return  The number of bytes encoded.
+uint32_t encodePingCnfMsg (char * pBuffer,
+                           char ** ppLog,
+                           uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent at power-on of the
 // UTM.  Indicates that the device has been initialised.  After
@@ -174,397 +208,397 @@ uint32_t encodeTransparentDatagram (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeInitIndUlMsg (char * pBuffer,
                              InitIndUlMsg_t * pMsg,
-                             char * pLog,
-                             uint32_t logSize);
+                             char ** ppLog,
+                             uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent at the expiry of a
 // reporting period, or whenever the status of the UTM
 // needs to be conveyed.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // buffer length must be at least MAX_MESSAGE_SIZE long
 uint32_t encodePollIndUlMsg (char * pBuffer,
                              PollIndUlMsg_t * pMsg,
-                             char * pLog,
-                             uint32_t logSize);
+                             char ** ppLog,
+                             uint32_t * pLogSize);
 
 /// Encode a downlink message that reboots the device.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeRebootReqDlMsg (char * pBuffer,
                                RebootReqDlMsg_t *pMsg,
-                               char * pLog,
-                               uint32_t logSize);
+                               char ** ppLog,
+                               uint32_t * pLogSize);
 
 /// Encode an uplink message that indicates the date/time on
 // the UTM.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeDateTimeIndUlMsg (char * pBuffer,
                                  DateTimeIndUlMsg_t * pMsg,
-                                 char * pLog,
-                                 uint32_t logSize);
+                                 char ** ppLog,
+                                 uint32_t * pLogSize);
 
 /// Encode a downlink message that sets the date/time on
 // the UTM.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeDateTimeSetReqDlMsg (char * pBuffer,
                                     DateTimeSetReqDlMsg_t * pMsg,
-                                    char * pLog,
-                                    uint32_t logSize);
+                                    char ** ppLog,
+                                    uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent in response to a
 // DateTimeSetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeDateTimeSetCnfUlMsg (char * pBuffer,
                                     DateTimeSetCnfUlMsg_t * pMsg,
-                                    char * pLog,
-                                    uint32_t logSize);
+                                    char ** ppLog,
+                                    uint32_t * pLogSize);
 
 /// Encode a downlink message that gets the date/time from the
 // UTM.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeDateTimeGetReqDlMsg (char * pBuffer,
-                                    char * pLog,
-                                    uint32_t logSize);
+                                    char ** ppLog,
+                                    uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent in response to a
 // DateTimeGetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeDateTimeGetCnfUlMsg (char * pBuffer,
                                     DateTimeGetCnfUlMsg_t * pMsg,
-                                    char * pLog,
-                                    uint32_t logSize);
+                                    char ** ppLog,
+                                    uint32_t * pLogSize);
 
 /// Encode a downlink message that sets the mode the device
 // is operating in.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeModeSetReqDlMsg (char * pBuffer,
                                 ModeSetReqDlMsg_t * pMsg,
-                                char * pLog,
-                                uint32_t logSize);
+                                char ** ppLog,
+                                uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent in response to a
 // ModeSetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeModeSetCnfUlMsg (char * pBuffer,
                                 ModeSetCnfUlMsg_t * pMsg,
-                                char * pLog,
-                                uint32_t logSize);
+                                char ** ppLog,
+                                uint32_t * pLogSize);
 
 /// Encode a downlink message that gets the mode the device
 // is operating in.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeModeGetReqDlMsg (char * pBuffer,
-                                char * pLog,
-                                uint32_t logSize);
+                                char ** ppLog,
+                                uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent in response to a
 // ModeGetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeModeGetCnfUlMsg (char * pBuffer,
                                 ModeGetCnfUlMsg_t * pMsg,
-                                char * pLog,
-                                uint32_t logSize);
+                                char ** ppLog,
+                                uint32_t * pLogSize);
 
 /// Encode a downlink message that retrieves the reading and
 // reporting intervals.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeIntervalsGetReqDlMsg (char * pBuffer,
-                                     char * pLog,
-                                     uint32_t logSize);
+                                     char ** ppLog,
+                                     uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // IntervalsGetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeIntervalsGetCnfUlMsg (char * pBuffer,
                                      IntervalsGetCnfUlMsg_t * pMsg,
-                                     char * pLog,
-                                     uint32_t logSize);
+                                     char ** ppLog,
+                                     uint32_t * pLogSize);
 
 /// Encode a downlink message that sets the reporting interval.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeReportingIntervalSetReqDlMsg (char * pBuffer,
                                              ReportingIntervalSetReqDlMsg_t * pMsg,
-                                             char * pLog,
-                                             uint32_t logSize);
+                                             char ** ppLog,
+                                             uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // ReportingIntervalSetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeReportingIntervalSetCnfUlMsg (char * pBuffer,
                                              ReportingIntervalSetCnfUlMsg_t * pMsg,
-                                             char * pLog,
-                                             uint32_t logSize);
+                                             char ** ppLog,
+                                             uint32_t * pLogSize);
 
 /// Encode a downlink message that sets the heartbeat.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeHeartbeatSetReqDlMsg (char * pBuffer,
                                      HeartbeatSetReqDlMsg_t * pMsg,
-                                     char * pLog,
-                                     uint32_t logSize);
+                                     char ** ppLog,
+                                     uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // HeartbeatSetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeHeartbeatSetCnfUlMsg (char * pBuffer,
                                      HeartbeatSetCnfUlMsg_t * pMsg,
-                                     char * pLog,
-                                     uint32_t logSize);
+                                     char ** ppLog,
+                                     uint32_t * pLogSize);
 
 /// Encode an uplink message containing the measurements.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsIndUlMsg (char * pBuffer,
                                      MeasurementsIndUlMsg_t * pMsg,
-                                     char * pLog,
-                                     uint32_t logSize);
+                                     char ** ppLog,
+                                     uint32_t * pLogSize);
 
 /// Encode a downlink message that retrieves measurements.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsGetReqDlMsg (char * pBuffer,
-                                        char  *pLog,
-                                        uint32_t logSize);
+                                        char ** ppLog,
+                                        uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // MeasurementsGetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsGetCnfUlMsg (char * pBuffer,
                                         MeasurementsGetCnfUlMsg_t * pMsg,
-                                        char * pLog,
-                                        uint32_t logSize);
+                                        char ** ppLog,
+                                        uint32_t * pLogSize);
 
 /// Encode a downlink message to set controls for a given measurement.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementControlSetReqDlMsg (char * pBuffer,
                                               MeasurementControlSetReqDlMsg_t * pMsg,
-                                              char * pLog,
-                                              uint32_t logSize);
+                                              char ** ppLog,
+                                              uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // MeasurementControlSetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementControlSetCnfUlMsg (char * pBuffer,
                                               MeasurementControlSetCnfUlMsg_t * pMsg,
-                                              char * pLog,
-                                              uint32_t logSize);
+                                              char ** ppLog,
+                                              uint32_t * pLogSize);
 
 /// Encode an uplink message that gives the measurements control settings.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsControlIndUlMsg (char * pBuffer,
                                             MeasurementsControlIndUlMsg_t * pMsg,
-                                            char * pLog,
-                                            uint32_t logSize);
+                                            char ** ppLog,
+                                            uint32_t * pLogSize);
 
 /// Encode a downlink message to get the measurements control settings.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsControlGetReqDlMsg (char * pBuffer,
-                                               char * pLog,
-                                               uint32_t logSize);
+                                               char ** ppLog,
+                                               uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // MeasurementsControlGetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsControlGetCnfUlMsg (char * pBuffer,
                                                MeasurementsControlGetCnfUlMsg_t * pMsg,
-                                               char * pLog,
-                                               uint32_t logSize);
+                                               char ** ppLog,
+                                               uint32_t * pLogSize);
 
 /// Encode a downlink message to put the measurements control settings
 // back to defaults.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsControlDefaultsSetReqDlMsg (char * pBuffer,
-                                                       char * pLog,
-                                                       uint32_t logSize);
+                                                       char ** ppLog,
+                                                       uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // MeasurementsControlDefaultsSetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeMeasurementsControlDefaultsSetCnfUlMsg (char * pBuffer,
-                                                       char * pLog,
-                                                       uint32_t logSize);
+                                                       char ** ppLog,
+                                                       uint32_t * pLogSize);
 
 /// Encode an uplink message containing a traffic report.
 // Values should be those accumulated since the InitIndUlMsg was
@@ -572,27 +606,27 @@ uint32_t encodeMeasurementsControlDefaultsSetCnfUlMsg (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficReportIndUlMsg (char * pBuffer,
                                       TrafficReportIndUlMsg_t * pMsg,
-                                      char * pLog,
-                                      uint32_t logSize);
+                                      char ** ppLog,
+                                      uint32_t * pLogSize);
 
 /// Encode a downlink message that retrieves a traffic report.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficReportGetReqDlMsg (char * pBuffer,
-                                         char * pLog,
-                                         uint32_t logSize);
+                                         char ** ppLog,
+                                         uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // TrafficReportGetReqDlMsg.
@@ -601,15 +635,15 @@ uint32_t encodeTrafficReportGetReqDlMsg (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficReportGetCnfUlMsg (char * pBuffer,
                                          TrafficReportGetCnfUlMsg_t * pMsg,
-                                         char * pLog,
-                                         uint32_t logSize);
+                                         char ** ppLog,
+                                         uint32_t * pLogSize);
 
 /// Encode a downlink message that sets the Traffic Test mode settings
 // for the UTM.  This must precede a mode change command to
@@ -617,58 +651,58 @@ uint32_t encodeTrafficReportGetCnfUlMsg (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeParametersSetReqDlMsg (char * pBuffer,
                                                      TrafficTestModeParametersSetReqDlMsg_t * pMsg,
-                                                     char * pLog,
-                                                     uint32_t logSize);
+                                                     char ** ppLog,
+                                                     uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent in response to a
 // TrafficTestModeParametersSetReqMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeParametersSetCnfUlMsg (char * pBuffer,
                                                      TrafficTestModeParametersSetCnfUlMsg_t * pMsg,
-                                                     char * pLog,
-                                                     uint32_t logSize);
+                                                     char ** ppLog,
+                                                     uint32_t * pLogSize);
 
 /// Encode a downlink message that gets the Traffic Test mode settings
 // from the UTM.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeParametersGetReqDlMsg (char * pBuffer,
-                                                     char * pLog,
-                                                     uint32_t logSize);
+                                                     char ** ppLog,
+                                                     uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent in response to a
 // TrafficTestModeParametersGetReqDlMsg.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeParametersGetCnfUlMsg (char * pBuffer,
                                                      TrafficTestModeParametersGetCnfUlMsg_t * pMsg,
-                                                     char * pLog,
-                                                     uint32_t logSize);
+                                                     char ** ppLog,
+                                                     uint32_t * pLogSize);
 
 /// Encode an uplink traffic test datagram.
 // This breaks all the rules, it is not a message, it is a whole
@@ -680,16 +714,16 @@ uint32_t encodeTrafficTestModeParametersGetCnfUlMsg (char * pBuffer,
 // (i.e. fill and length).
 // \param isDownlink if true this will be encoded as a downlink
 // datagram, otherwise it will be encoded as an uplink datagram
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeRuleBreakerDatagram (char * pBuffer,
                                                    TrafficTestModeRuleBreakerDatagram_t * pSpec,
                                                    bool isDownlink,
-                                                   char * pLog,
-                                                   uint32_t logSize);
+                                                   char ** ppLog,
+                                                   uint32_t * pLogSize);
 
 /// Encode an uplink message containing the traffic report format
 // used in Traffic Test mode.
@@ -698,27 +732,27 @@ uint32_t encodeTrafficTestModeRuleBreakerDatagram (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeReportIndUlMsg (char * pBuffer,
                                               TrafficTestModeReportIndUlMsg_t * pMsg,
-                                              char * pLog,
-                                              uint32_t logSize);
+                                              char ** ppLog,
+                                              uint32_t * pLogSize);
 
 /// Encode a downlink message that retrieves a Test Mode traffic report.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeReportGetReqDlMsg (char * pBuffer,
-                                                 char * pLog,
-                                                 uint32_t logSize);
+                                                 char ** ppLog,
+                                                 uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // TrafficTestModeReportGetReqDlMsg.
@@ -727,42 +761,42 @@ uint32_t encodeTrafficTestModeReportGetReqDlMsg (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeTrafficTestModeReportGetCnfUlMsg (char * pBuffer,
                                                  TrafficTestModeReportGetCnfUlMsg_t * pMsg,
-                                                 char * pLog,
-                                                 uint32_t logSize);
+                                                 char ** ppLog,
+                                                 uint32_t * pLogSize);
 
 /// Encode an uplink message containing the activity of the module.
 // Values should be those accumulated since boot.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeActivityReportIndUlMsg (char * pBuffer,
                                        ActivityReportIndUlMsg_t * pMsg,
-                                       char * pLog,
-                                       uint32_t logSize);
+                                       char ** ppLog,
+                                       uint32_t * pLogSize);
 
 /// Encode a downlink message that retrieves an Activity report.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeActivityReportGetReqDlMsg (char * pBuffer,
-                                          char * pLog,
-                                          uint32_t logSize);
+                                          char ** ppLog,
+                                          uint32_t * pLogSize);
 
 /// Encode an uplink message that is sent as a response to a
 // ActivityReportGetReqDlMsg.
@@ -770,29 +804,29 @@ uint32_t encodeActivityReportGetReqDlMsg (char * pBuffer,
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeActivityReportGetCnfUlMsg (char * pBuffer,
                                           ActivityReportGetCnfUlMsg_t * pMsg,
-                                          char * pLog,
-                                          uint32_t logSize);
+                                          char ** ppLog,
+                                          uint32_t * pLogSize);
 
 /// Encode an uplink message that contains a debug string.
 // \param pBuffer  A pointer to the buffer to encode into.  The
 // buffer length must be at least MAX_MESSAGE_SIZE long
 // \param pMsg  A pointer to the message to send.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The number of bytes encoded.
 uint32_t encodeDebugIndUlMsg (char * pBuffer,
                               DebugIndUlMsg_t * pMsg,
-                              char * pLog,
-                              uint32_t logSize);
+                              char ** ppLog,
+                              uint32_t * pLogSize);
 
 // ----------------------------------------------------------------
 // MESSAGE DECODING FUNCTIONS
@@ -816,11 +850,14 @@ typedef enum DecodeResultTag_t
                                                    //! but the contents are not of the right length.
      DECODE_RESULT_OUT_OF_SEQUENCE_TRAFFIC_TEST_MODE_DATAGRAM, //!< A traffic test datagram has been decoded
                                                                //! but the sequence number is not as expected.
+     DECODE_RESULT_BAD_CHECKSUM, //!< The checksum on a message was bad, it should be ignored.
      DECODE_RESULT_DL_MSG_BASE = 0x40,  //!< From here on are the
                                         //! downlink messages.
                                         // !!! If you add one here
                                         // update the next line !!!
      DECODE_RESULT_TRANSPARENT_DL_DATAGRAM = DECODE_RESULT_DL_MSG_BASE,
+     DECODE_RESULT_PING_REQ_DL_MSG,
+     DECODE_RESULT_PING_CNF_DL_MSG,
      DECODE_RESULT_REBOOT_REQ_DL_MSG,
      DECODE_RESULT_DATE_TIME_SET_REQ_DL_MSG,
      DECODE_RESULT_DATE_TIME_GET_REQ_DL_MSG,
@@ -844,6 +881,8 @@ typedef enum DecodeResultTag_t
      DECODE_RESULT_UL_MSG_BASE = 0x80,    //!< From here on are the
                                           //! uplink messages.
      DECODE_RESULT_TRANSPARENT_UL_DATAGRAM = DECODE_RESULT_UL_MSG_BASE,
+     DECODE_RESULT_PING_REQ_UL_MSG,
+     DECODE_RESULT_PING_CNF_UL_MSG,
      DECODE_RESULT_INIT_IND_UL_MSG,
      DECODE_RESULT_DATE_TIME_IND_UL_MSG,
      DECODE_RESULT_DATE_TIME_SET_CNF_UL_MSG,
@@ -856,8 +895,8 @@ typedef enum DecodeResultTag_t
      DECODE_RESULT_POLL_IND_UL_MSG,
      DECODE_RESULT_MEASUREMENTS_IND_UL_MSG,
      DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG,
-     DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG,
      DECODE_RESULT_MEASUREMENTS_CONTROL_IND_UL_MSG,
+     DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG,
      DECODE_RESULT_MEASUREMENTS_CONTROL_GET_CNF_UL_MSG,
      DECODE_RESULT_MEASUREMENTS_CONTROL_DEFAULTS_SET_CNF_UL_MSG,
      DECODE_RESULT_TRAFFIC_REPORT_IND_UL_MSG,
@@ -889,17 +928,17 @@ typedef enum DecodeResultTag_t
 // \param sizeInBuffer  The number of bytes left to decode.
 // \param pOutBuffer  A pointer to the buffer to write the
 // result into.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The result of the decoding, which hopefully says
 // what message has been decoded.
 DecodeResult_t decodeDlMsg (const char ** ppInBuffer,
                             uint32_t sizeInBuffer,
                             DlMsgUnion_t * pOutBuffer,
-                            char * pLog,
-                            uint32_t logSize);
+                            char ** ppLog,
+                            uint32_t * pLogSize);
 
 /// Decode an uplink message. When a datagram has been received
 // this function should be called iteratively to decode all the
@@ -914,17 +953,17 @@ DecodeResult_t decodeDlMsg (const char ** ppInBuffer,
 // \param sizeInBuffer  The number of bytes left to decode.
 // \param pOutBuffer  A pointer to the buffer to write the
 // result into.
-// \param pLog  Optionally, a pointer to a log buffer in which
+// \param ppLog  Optionally, a pointer to a pointer to a log buffer in which
 // to write an XML log of the encoded message.
-// \param logSize  Optionally, the size of the log buffer.
+// \param pLogSize  Optional pointer to the size of the log buffer.
 // Should be present if pLog is present.
 // \return  The result of the decoding, which hopefully says
 // what message has been decoded.
 DecodeResult_t decodeUlMsg (const char ** ppInBuffer,
                             uint32_t sizeInBuffer,
                             UlMsgUnion_t * pOutBuffer,
-                            char * pLog,
-                            uint32_t logSize);
+                            char ** ppLog,
+                            uint32_t * pLogSize);
 
 // ----------------------------------------------------------------
 // LOGGING FUNCTIONS
@@ -1007,6 +1046,14 @@ uint32_t logBeginTagWithStringValue (char * pBuffer, uint32_t *pBufferSize, cons
 // \param pTag  a pointer to the tag to use.
 // \return the number of bytes used.
 uint32_t logEndTag (char * pBuffer, uint32_t *pBufferSize, const char *pTag);
+
+/// Log just a tag with no values.
+// \param pBuffer  a pointer to the logging buffer.
+// \param pBufferSize a pointer to the size of the logging buffer.  This
+// will be modified on exit to reflect the bytes used.
+// \param pTag  a pointer to the tag to use.
+// \return the number of bytes used.
+uint32_t logFlagTag(char * pBuffer, uint32_t *pBufferSize, const char *pTag);
 
 /// Log a tag with a simple string value.
 // \param pBuffer  a pointer to the logging buffer.
@@ -1102,7 +1149,7 @@ uint32_t logBatteryVoltage (char * pBuffer, uint32_t *pBufferSize, uint16_t batt
 // will be modified on exit to reflect the bytes used.
 // \param batteryEnergy the energy value to use.
 // \return the number of bytes used.
-uint32_t logBatteryEnergy (char * pBuffer, uint32_t *pBufferSize, uint16_t batteryEnergy);
+uint32_t logBatteryEnergy (char * pBuffer, uint32_t *pBufferSize, uint32_t batteryEnergy);
 
 /// Log a position value.
 // \param pBuffer  a pointer to the logging buffer.
@@ -1141,8 +1188,9 @@ uint32_t logTrafficReportUl (char * pBuffer, uint32_t *pBufferSize, uint32_t dat
 // will be modified on exit to reflect the bytes used.
 // \param datagrams the number of datagrams.
 // \param bytes the number of bytes.
+// \param badChecksum the number of datagrams with a bad checksum.
 // \return the number of bytes used to code the message.
-uint32_t logTrafficReportDl (char * pBuffer, uint32_t *pBufferSize, uint32_t datagrams, uint32_t bytes);
+uint32_t logTrafficReportDl(char * pBuffer, uint32_t *pBufferSize, uint32_t datagrams, uint32_t bytes, uint32_t badChecksum);
 
 /// Log the traffic test mode parameters for the UTM to transmit.
 // \param pBuffer  a pointer to the logging buffer.

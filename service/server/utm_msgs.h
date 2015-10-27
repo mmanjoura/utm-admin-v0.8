@@ -29,11 +29,18 @@
 /// The maximum length of a messages in bytes
 #define MAX_MESSAGE_SIZE MAX_DATAGRAM_SIZE_RAW
 
+// The size of the checksum (which is at the end of all messages
+// except the Transparent Datagram)
+#define CHECKSUM_SIZE  1
+
+// The size of a message ID
+#define MSG_ID_SIZE 1
+
 /// The minimum length of a messages in bytes
-#define MIN_MESSAGE_SIZE 1
+#define MIN_MESSAGE_SIZE 1 + CHECKSUM_SIZE
 
 /// The maximum debug string size
-#define MAX_DEBUG_STRING_SIZE MAX_MESSAGE_SIZE - sizeof (uint32_t)
+#define MAX_DEBUG_STRING_SIZE MAX_MESSAGE_SIZE - MSG_ID_SIZE - sizeof (uint8_t) - CHECKSUM_SIZE
 
 /// The lower limits for reading and reporting intervals
 // There is also an upper limit set by the memory capacity
@@ -49,6 +56,8 @@
 #define MAX_ENERGY_MWH 0xFFFFFF
 #define MIN_RSSI_RSRP ((int16_t) 0xC000) // 15 bits negative number
 #define MAX_RSSI_RSRP 0
+#define MAX_MEASUREMENT_CONTROL_MEASUREMENT_INTERVAL 0xFFFF // 16 bits
+#define MAX_MEASUREMENT_CONTROL_REPORTING_INTERVAL 0xFFFF // 16 bits
 
 // ----------------------------------------------------------------
 // TYPES
@@ -171,7 +180,7 @@ typedef struct RsrpTag_t
 } Rsrp_t;
 
 /// CellId.
-typedef uint8_t CellId_t;
+typedef uint16_t CellId_t;
 
 /// Enum to hold the charger state (must be codeable into two bits).
 // If you add anything here, don't forget to update the related logging strings
@@ -214,9 +223,17 @@ typedef struct MeasurementsTag_t
 typedef struct MeasurementControlGenericTag_t
 {
     uint32_t measurementInterval;     //!< How often, in heartbeats, to take a measurement.
+                                      //! While this is represented as a 32 bit number, only
+                                      //! the first 16 bits are encoded
     uint32_t maxReportingInterval;    //!< How often, in reporting intervals, a reading must
                                       //! be taken and reported, irrespective of any other
                                       //! settings here.
+                                      //! While this is represented as a 32 bit number, only
+                                      //! the first 16 bits are encoded
+                                      //! The above two values are 16 bit rather than 32 bit
+                                      //! as otherwise the max measurementsControl message,
+                                      //! with all the elements in, doesn't fit into our maximum
+                                      //! message size of 121 bytes
     bool useHysteresis;               //!< If true, only report if the value changes by
                                       //! +/-hysteresisValue.
     uint32_t hysteresisValue;         //!< hysteresisValue.
@@ -265,6 +282,12 @@ typedef struct TransparentDatagramTag_t
      char contents[MAX_DATAGRAM_SIZE_RAW - 1];
 } TransparentDatagram_t;
 
+/// PingReqMsg_t. A ping request, which requires a respone.
+// No structure for this, it's an empty message.
+
+/// PingCnfMsg_t. The confirm sent in response to a ping request,
+// No structure for this, it's an empty message.
+
 /// InitIndUlMsg_t.  Sent at power on of the UTM, indicating that it
 // has initialised.  The revision level field should will be populated
 // automatically by the message codec.
@@ -280,6 +303,9 @@ typedef struct InitIndUlMsgTag_t
                                      //! written to SD card, saving heartbeat time.
     bool         disableButton;      //!< If true then the button on the side of the
                                      //! UTM has been disabled.
+    bool         disableServerPing;  //!< If true then the periodic "are you there"
+                                     //! ping request and subsequent reboot on no
+                                     //! response is disabled.
 } InitIndUlMsg_t;
 
 /// RebootReqDlMsg_t. Sent to reboot the UTM and set various flags.
@@ -300,6 +326,9 @@ typedef struct RebootReqDlMsgTag_t
                             //! to true then the capture and storage of
                             //! the modem debug is disabled.
     bool disableButton;     //!< Disable the button on the side of the UTM.
+    bool disableServerPing; //!< If true then the periodic "are you there"
+                            //! ping request and subsequent reboot on no
+                            //! response is disabled.
 } RebootReqDlMsg_t;
 
 /// DateTimeSetReqDlMsg_t. Sent to set the date/time on the UTM.
@@ -508,6 +537,7 @@ typedef struct TrafficReportIndUlMsgTag_t
     uint32_t numBytesUl;
     uint32_t numDatagramsDl;
     uint32_t numBytesDl;
+    uint32_t numDatagramsDlBadChecksum;
 } TrafficReportIndUlMsg_t;
 
 /// TrafficReportGetReqDlMsg_t.  Request a traffic report.
@@ -521,12 +551,13 @@ typedef struct TrafficReportGetCnfUlMsgTag_t
     uint32_t numBytesUl;
     uint32_t numDatagramsDl;
     uint32_t numBytesDl;
+    uint32_t numDatagramsDlBadChecksum;
 } TrafficReportGetCnfUlMsg_t;
 
 /// DebugIndUlMsg_t.  A generic message containing a debug string.
 typedef struct DebugIndUlMsgTag_t
 {
-    uint32_t sizeOfString;              //!< String size in bytes
+    uint8_t sizeOfString;               //!< String size in bytes
     char string[MAX_DEBUG_STRING_SIZE]; //!< The string (not NULL terminated).
 } DebugIndUlMsg_t;
 

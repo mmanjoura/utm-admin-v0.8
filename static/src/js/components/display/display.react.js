@@ -138,9 +138,9 @@ var Display = React.createClass({
                         </td>
                         <td className="center">
                           <ul>
-                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "--"}</li>
-                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "--"}</li>
-                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "--"}</li>
+                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"}</li>
+                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"}</li>
+                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0"}</li>
                           </ul>
                         </td>
                         <td className="center">{this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"}</td>
@@ -171,9 +171,9 @@ var Display = React.createClass({
                         </td>
                         <td className="center" style={{width: 75}}>
                           <ul>
-                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "--"}</li>
-                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "--"}</li>
-                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "--"}</li>
+                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"}</li>
+                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"}</li>
+                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0"}</li>
                           </ul>
                         </td>
                         <td className="center" style={{width: 25}}>{this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"}</td>

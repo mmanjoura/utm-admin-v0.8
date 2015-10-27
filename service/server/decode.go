@@ -199,7 +199,7 @@ func decode(data []byte) {
 			break
 		}
 
-		result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, nil, 0)
+		result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, nil, nil)
 		fmt.Printf("%s DECODE RECEIVED UPLINK MESSAGE %+v \n\n -----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
 
 		// Extract any data to be recorded; the C symbols are not available outside
@@ -336,7 +336,7 @@ func encodeAndEnqueueReportingInterval(mins uint32) error {
 		var dataPointer = (*C.ReportingIntervalSetReqDlMsg_t)(unsafe.Pointer(&data))
 
 		// Encode the data structure into the output buffer
-		cbytes := C.encodeReportingIntervalSetReqDlMsg(outputPointer, dataPointer, nil, 0)
+		cbytes := C.encodeReportingIntervalSetReqDlMsg(outputPointer, dataPointer, nil, nil)
 
 		// Send the populated output buffer bytes to NeulNet
 		payload := outputBuffer[:cbytes]

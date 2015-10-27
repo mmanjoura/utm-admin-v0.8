@@ -22637,7 +22637,7 @@ module.exports = Setting;
  * All rights reserved.
  */
 var React = require('react');
-var AppStore = require('../../stores/appstore.js');
+var AppStore = require('../../stores/app-store.js');
 var Configure = require('../panels/configure.react')
 var Summary = require('../panels/summary.react')
 var Hint = require('../panels/hint.react')
@@ -22719,7 +22719,6 @@ var Display = React.createClass({displayName: "Display",
             React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350}}, 
               React.createElement("div", {className: "panel-body"}, 
                 React.createElement("p", {style: {fontStyle: 'italic'}}, 
-               
                   React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.state["LatestDisplayRow"]["TotalMsgs"]), React.createElement("br", null), 
                   React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDataVolume"]["UplinkBytes"], React.createElement("br", null), 
                   React.createElement("b", null, "Last Msg:"), "    ", this.state["LatestDisplayRow"]["UlastMsgReceived"], React.createElement("br", null)
@@ -22773,9 +22772,9 @@ var Display = React.createClass({displayName: "Display",
                         ), 
                         React.createElement("td", {className: "center"}, 
                           React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "--"), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "--"), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "--")
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0")
                           )
                         ), 
                         React.createElement("td", {className: "center"}, this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"), 
@@ -22806,9 +22805,9 @@ var Display = React.createClass({displayName: "Display",
                         ), 
                         React.createElement("td", {className: "center", style: {width: 75}}, 
                           React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "--"), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "--"), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "--")
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0")
                           )
                         ), 
                         React.createElement("td", {className: "center", style: {width: 25}}, this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"), 
@@ -22863,7 +22862,7 @@ function pollState(updateState) {
 }
 
 module.exports = Display;
-},{"../../mixins/StoreWatchMixin":207,"../../stores/appstore.js":208,"../panels/configure.react":200,"../panels/hint.react":201,"../panels/measurements.react":202,"../panels/summary.react":203,"./displayRow.react":198,"react":188,"react-router-component":8}],198:[function(require,module,exports){
+},{"../../mixins/StoreWatchMixin":207,"../../stores/app-store.js":208,"../panels/configure.react":200,"../panels/hint.react":201,"../panels/measurements.react":202,"../panels/summary.react":203,"./displayRow.react":198,"react":188,"react-router-component":8}],198:[function(require,module,exports){
 /**
  * Copyright (c) 2014, U-blox.
  * All rights reserved.
@@ -23437,9 +23436,9 @@ var Summary = React.createClass({displayName: "Summary",
             React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350}}, 
               React.createElement("div", {className: "panel-body"}, 
                 React.createElement("p", {style: {fontStyle: 'italic'}}, 
-                  React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.props["LatestDisplayRow"]["TotalMsgs"]), React.createElement("br", null), 
-                  React.createElement("b", null, "Total Bytes:"), " ", this.props["LatestDataVolume"]["UplinkBytes"], React.createElement("br", null), 
-                  React.createElement("b", null, "Last Msg:"), "    ", this.props["LatestDisplayRow"]["UlastMsgReceived"], React.createElement("br", null)
+                  React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  "/*this.state["LatestDisplayRow"]["TotalMsgs"]*/), React.createElement("br", null), 
+                  React.createElement("b", null, "Total Bytes:"), " ", /*this.state["LatestDataVolume"]["UplinkBytes"]*/React.createElement("br", null), 
+                  React.createElement("b", null, "Last Msg:"), "    ", /*this.state["LatestDisplayRow"]["UlastMsgReceived"]*/React.createElement("br", null)
                 )
               )
             )
@@ -23447,9 +23446,6 @@ var Summary = React.createClass({displayName: "Summary",
     );
   }
 });
-
-
-
 
 module.exports = Summary;
 
@@ -23484,7 +23480,7 @@ var React = require('react');
 React.render(React.createElement(App, null), document.getElementById('main'));
 },{"./components/app":191,"react":188}],207:[function(require,module,exports){
 var React = require('react');
-var AppStore = require('../stores/appstore');
+var AppStore = require('../stores/app-store');
 
 var StoreWatchMixin = function(cb){
   return {
@@ -23504,7 +23500,7 @@ var StoreWatchMixin = function(cb){
 }
 
 module.exports = StoreWatchMixin;
-},{"../stores/appstore":208,"react":188}],208:[function(require,module,exports){
+},{"../stores/app-store":208,"react":188}],208:[function(require,module,exports){
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
 var assign = require('react/lib/Object.assign');
@@ -23512,61 +23508,37 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = 'change';
 
-var _data = {};
 
-var AppStore = assign({}, EventEmitter.prototype, {
+function _setCommissioning(uuid){
+}
+function _setTrafficTest(uuid){
+}
+function _setStandardTrx(uuid){
+}
+function _setHeartBeat(uuid){
+}
+function _setReportingInterval(uuid){
+}
+function _reboot(uuid){
+}
 
-  getAll: function(){
-        pollState(function(data) {
-      // fixup missing state properties to avoid muliple levels of missing attribute tests
-      [
-        "Connection",
-        "LatestRssi",
-        "LatestRssiDisplay",
-        "LatestPowerState",
-        "LatestPowerStateDisplay",
-        "LatestDataVolume",
-        "InitIndUlMsg",
-        "LatestPollIndUlMsg",
-        "LatestTrafficReportIndUlMsg",
-        "LatestDisplayRow"
-      ].map(function(property) {
-        if (!data[property]) {
-          data[property] = {};
-        }
-      });
-
-      if (window.location.hash == "#debug") {
-        data.json = JSON.stringify(data, null, "  ");
-      } else {
-        data.json = "";
-      }
-      // this.setState(data);
-      console.log(data);  
-      _data = data;
-    }.bind(this), 10000);
-
-    return _data;
+  var AppStore = assign(EventEmitter.prototype, {
+  emitChange: function(){
+    this.emit(CHANGE_EVENT)
   },
 
-  emitChange: function() {
-    this.emit(CHANGE_EVENT);
+  addChangeListener: function(callback){
+    this.on(CHANGE_EVENT, callback)
   },
 
-  /**
-   * @param {function} callback
-   */
-  addChangeListener: function(callback) {
-    this.on(CHANGE_EVENT, callback);
+  removeChangeListener: function(callback){
+    this.removeListener(CHANGE_EVENT, callback)
   },
 
-  /**
-   * @param {function} callback
-   */
-  removeChangeListener: function(callback) {
-    this.removeListener(CHANGE_EVENT, callback);
-  }
-});
+  getUtmsData: function(){
+    return states
+  },
+
 
   dispatcherIndex: AppDispatcher.register(function(payload){
     var action = payload.action; // this is our action from handleViewAction
@@ -23574,43 +23546,30 @@ var AppStore = assign({}, EventEmitter.prototype, {
 
       case AppConstants.SET_COMMISSIONING:
         _setCommissioning(payload.action.index);
-         AppStore.emitChange();
         break;
-
+      case AppConstants.SET_TRAFFIC_TEST:
+        _setTrafficTest(payload.action.index);
+        break;
+      case AppConstants.SET_STANDARD_TRX:
+        _setStandardTrx(payload.action.index);
+        break;
+      case AppConstants.SET_HEARTBEAT:
+        _setHeartBeat(payload.action.index);
+        break;
+      case AppConstants.SET_REPORTING_INTERVAL:
+        _setReportingInterval(payload.action.index);
+        break;
+      case AppConstants.REBOOT:
+        reboot(payload.action.index);
+        break;
     }
+
+    AppStore.emitChange();
 
     return true;
   })
 
-
+})
 
 module.exports = AppStore;
-
-function formatTime(ts) {
-  if (ts != null) {
-    var i = ts.indexOf(".");
-    return ts.substr(0, i).replace("T", " ");
-  }
-
-}
-
-function pollState(updateState) {
-  function pollLoop() {
-    var x = new XMLHttpRequest();
-    x.onreadystatechange = function() {
-      if (x.readyState == 4) {
-        if (x.status == 200) {
-          var data = JSON.parse(x.responseText);
-         
-          updateState(data);
-        }
-        window.setTimeout(pollLoop, 1000);
-      }
-    };
-
-    x.open("GET", "latestState", true);
-    x.send();
-  }
-  pollLoop();
-}
 },{"../constants/app-constants":204,"../dispatchers/app-dispatcher":205,"events":1,"react/lib/Object.assign":56}]},{},[206]);

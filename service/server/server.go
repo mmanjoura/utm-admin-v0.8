@@ -180,6 +180,6 @@ func Run() {
 	//n.Use(negroni.HandlerFunc(system.MgoMiddleware))
 	n.Use(sessions.Sessions("global_session_store", store))
 	n.UseHandler(router)
-	n.Run(":3001")
+	n.Run(":8080")
 
 }
