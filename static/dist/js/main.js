@@ -22745,7 +22745,7 @@ var Display = React.createClass({displayName: "Display",
                         React.createElement("th", null, "Downsteam"), 
                         React.createElement("th", null, "RSRP "), 
                         React.createElement("th", null, 
-                          "Battery - ", React.createElement("i", {className: "fa fa-floppy-o"})
+                          "Others"
                         )
                       )
                     ), 
@@ -22777,10 +22777,10 @@ var Display = React.createClass({displayName: "Display",
                             React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0")
                           )
                         ), 
-                        React.createElement("td", {className: "center"}, this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"), 
-                        React.createElement("td", {className: "center"}, 
-                          this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0", " -", 
-                          this.state["LatestDisplayRow"]["DiskSpaceLeft"] ? "" : " 0"
+                        React.createElement("td", {className: "center"}), 
+                        React.createElement("td", {className: "center", style: {width: 65}}, 
+                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
+                          React.createElement("i", {className: "fa fa-battery-full"}), " ", this.state["LatestDisplayRow"]["BatteryLevel"]
                         )
                       ), 
                     React.createElement("tr", {className: "even gradeC"}, 

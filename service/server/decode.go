@@ -244,8 +244,8 @@ func decode(data []byte) {
 
 			Row.TotalMsgs = TotalMsgs
 			Row.Mode = ModeLookUp[string(ModeEnum(value.mode))]
-			Row.BatteryLevel = ModeLookUp[string(EnergyLeftEnum(value.energyLeft))]
-			Row.DiskSpaceLeft = ModeLookUp[string(DiskSpaceLeft(value.diskSpaceLeft))]
+			Row.BatteryLevel = EnergyLeftLookUP[int(EnergyLeftEnum(value.energyLeft))]
+			Row.DiskSpaceLeft = DiskSpaceLookUP[int(DiskSpaceLeft(value.diskSpaceLeft))]
 
 			// row := &DisplayRow{
 			// 	TotalMsgs:     TotalMsgs + 1,
@@ -253,6 +253,7 @@ func decode(data []byte) {
 			// 	DiskSpaceLeft: string(EnergyLeftEnum(value.energyLeft)),
 			// 	BatteryLevel:  string(DiskSpaceLeft(value.diskSpaceLeft)),
 			// }
+			fmt.Printf("%s THE LATEST DATA IN THE ROW IS:  %s\n", logTag, spew.Sdump(Row))
 			multipleRecords = append(multipleRecords, Row)
 
 		case C.DECODE_RESULT_DEBUG_IND_UL_MSG:

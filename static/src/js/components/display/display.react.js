@@ -111,7 +111,7 @@ var Display = React.createClass({
                         <th>Downsteam</th>
                         <th>RSRP </th>
                         <th>
-                          Battery - <i className="fa fa-floppy-o" />
+                          Others
                         </th>
                       </tr>
                     </thead>
@@ -143,10 +143,10 @@ var Display = React.createClass({
                             <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0"}</li>
                           </ul>
                         </td>
-                        <td className="center">{this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"}</td>
-                        <td className="center">
-                          {this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"} -
-                          {this.state["LatestDisplayRow"]["DiskSpaceLeft"] ? "" : " 0"}
+                        <td className="center"></td>
+                        <td className="center" style={{width: 65}}>
+                          <i className="fa fa-floppy-o" /> {this.state["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
+                          <i className="fa fa-battery-full" /> {this.state["LatestDisplayRow"]["BatteryLevel"]}
                         </td> 
                       </tr>
                     <tr className="even gradeC">

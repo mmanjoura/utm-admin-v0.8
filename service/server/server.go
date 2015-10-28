@@ -88,17 +88,8 @@ func setReportingInterval(response http.ResponseWriter, request *http.Request) *
 	return nil
 }
 
-func processAmqp() {
+func processAmqp(username, amqpAddress string) {
 
-	settings, err := forge.ParseFile("config.cfg")
-	if err != nil {
-		panic(err)
-	}
-
-	amqp, err := settings.GetSection("amqp")
-
-	username, err := amqp.GetString("uname")
-	amqpAddress, err := amqp.GetString("amqp_address")
 	//ueGuid, err := amqp.GetString("ueguid")
 
 	// create a queue and bind it with relevant routing keys
@@ -172,8 +163,20 @@ func processAmqp() {
 
 func Run() {
 
+	settings, err := forge.ParseFile("config.cfg")
+	if err != nil {
+		panic(err)
+	}
+
+	amqp, err := settings.GetSection("amqp")
+	username, err := amqp.GetString("uname")
+	amqpAddress, err := amqp.GetString("amqp_address")
+
+	host, err := settings.GetSection("host")
+	port, err := host.GetString("port")
+
 	// Process Amqp messages
-	go processAmqp()
+	go processAmqp(username, amqpAddress)
 
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 
@@ -192,6 +195,6 @@ func Run() {
 	//n.Use(negroni.HandlerFunc(system.MgoMiddleware))
 	n.Use(sessions.Sessions("global_session_store", store))
 	n.UseHandler(router)
-	n.Run(":8080")
+	n.Run(port)
 
 }
