@@ -78,7 +78,7 @@ var ulDecodeTypeDisplay map[int]string = map[int]string{
 	C.DECODE_RESULT_REPORTING_INTERVAL_SET_CNF_UL_MSG:            "DECODE_RESULT_REPORTING_INTERVAL_SET_CNF_UL_MSG",
 	C.DECODE_RESULT_INTERVALS_GET_CNF_UL_MSG:                     "DECODE_RESULT_INTERVALS_GET_CNF_UL_MSG",
 	C.DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG:                  "DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG",
-	C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:                      "DECODE_RESULT_MEASUREMENTS_IND_UL_MSG",
+	C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:                      "DECODE_RESULT_MEASUREMENTS_IND_UIntervalL_MSG",
 	C.DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG:           "DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG",
 	C.DECODE_RESULT_MEASUREMENTS_CONTROL_GET_CNF_UL_MSG:          "DECODE_RESULT_MEASUREMENTS_CONTROL_GET_CNF_UL_MSG",
 	C.DECODE_RESULT_MEASUREMENTS_CONTROL_IND_UL_MSG:              "DECODE_RESULT_MEASUREMENTS_CONTROL_IND_UL_MSG",
@@ -221,6 +221,7 @@ func decode(data []byte) {
 
 		case C.DECODE_RESULT_INTERVALS_GET_CNF_UL_MSG:
 			rawData = C.getIntervalsGetCnfUlMsg(inputBuffer)
+			fmt.Printf("%s RECEIVED INTERVAL REQUEST CONFIRM %s\n", logTag, spew.Sdump(inputBuffer))
 
 		case C.DECODE_RESULT_REPORTING_INTERVAL_SET_CNF_UL_MSG:
 			value := C.getReportingIntervalSetCnfUlMsg(inputBuffer)
@@ -247,14 +248,9 @@ func decode(data []byte) {
 			Row.BatteryLevel = EnergyLeftLookUP[int(EnergyLeftEnum(value.energyLeft))]
 			Row.DiskSpaceLeft = DiskSpaceLookUP[int(DiskSpaceLeft(value.diskSpaceLeft))]
 
-			// row := &DisplayRow{
-			// 	TotalMsgs:     TotalMsgs + 1,
-			// 	Mode:          string(ModeEnum(value.mode)),
-			// 	DiskSpaceLeft: string(EnergyLeftEnum(value.energyLeft)),
-			// 	BatteryLevel:  string(DiskSpaceLeft(value.diskSpaceLeft)),
-			// }
-			fmt.Printf("%s THE LATEST DATA IN THE ROW IS:  %s\n", logTag, spew.Sdump(Row))
 			multipleRecords = append(multipleRecords, Row)
+
+			encodeAndEnqueueIntervalGetReq(Row.Uuid)
 
 		case C.DECODE_RESULT_DEBUG_IND_UL_MSG:
 			rawData = C.getDebugIndUlMsg(inputBuffer)
@@ -350,6 +346,44 @@ func encodeAndEnqueueReportingInterval(mins uint32) error {
 			msg.Payload = append(msg.Payload, int(v))
 		}
 		log.Printf("%s ENCODED A REPORTING INTERVAL UPDATE OF %d MINUTES AS %v USING AMQP MESSAGE %+v\n", logTag, mins, payload, msg)
+
+		downlinkMessages <- msg
+		now := time.Now()
+
+		// Record the downlink data volume
+		StateTableCmds <- &DataVolume{
+			DownlinkTimestamp: &now,
+			DownlinkBytes:     uint64(len(payload)),
+		}
+
+		return nil
+	}
+
+	return errors.New("NO DOWNLINKMESSAGES CHANNEL AVAILABLE TO ENQUEUE THE ENCODED MESSAGE")
+}
+
+func encodeAndEnqueueIntervalGetReq(ueGuid string) error {
+	if downlinkMessages != nil {
+
+		// Create a buffer that is big enough to store all
+		// the encoded data and take a pointer to it's first element
+		var outputBuffer [C.MAX_DATAGRAM_SIZE_RAW]byte
+		outputPointer := (*C.char)(unsafe.Pointer(&outputBuffer[0]))
+
+		// Encode the data structure into the output buffer
+		cbytes := C.encodeIntervalsGetReqDlMsg(outputPointer, nil, nil)
+
+		// Send the populated output buffer bytes to NeulNet
+		payload := outputBuffer[:cbytes]
+		msg := AmqpMessage{
+			Device_uuid:   ueGuid,
+			Endpoint_uuid: 4,
+			//Payload:       payload,
+		}
+		for _, v := range payload {
+			msg.Payload = append(msg.Payload, int(v))
+		}
+		log.Printf("%s ENCODED A REPORTING INTERVAL UPDATE OF %d MINUTES AS USING AMQP MESSAGE %+v\n", logTag, payload, msg)
 
 		downlinkMessages <- msg
 		now := time.Now()

@@ -171,6 +171,7 @@ func Run() {
 	amqp, err := settings.GetSection("amqp")
 	username, err := amqp.GetString("uname")
 	amqpAddress, err := amqp.GetString("amqp_address")
+	//ueGuid, err := amqp.GetString("ueguid")
 
 	host, err := settings.GetSection("host")
 	port, err := host.GetString("port")
