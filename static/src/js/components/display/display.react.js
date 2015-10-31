@@ -29,8 +29,8 @@ var Display = React.createClass({
         "LatestPowerState": {},
         "LatestPowerStateDisplay": {},
         "LatestDataVolume": {},
-        "LatestDisplayRow": {},
-        "Device_Setting" : {}
+        "LatestDisplayRow": {}
+    
     
     };
 
@@ -127,6 +127,8 @@ var Display = React.createClass({
                             <li><b>Uuid:</b> {this.state["LatestDisplayRow"]["Uuid"]}</li>
                             <li><b>Mode:</b> {this.state["LatestDisplayRow"]["Mode"]}</li>
                             <li><b>Name:</b> {this.state["LatestDisplayRow"]["UnitName"]}</li>
+                             <li><b>Reporting Interval:</b> {this.state["LatestDisplayRow"]["ReportingInterval"]}</li>
+                              <li><b>Heart Beat:</b> {this.state["LatestDisplayRow"]["HeartbeatSeconds"]}</li>
                           </ul>   
                         </td>
                         <td>
@@ -138,48 +140,50 @@ var Display = React.createClass({
                         </td>
                         <td className="center">
                           <ul>
-                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"}</li>
-                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"}</li>
-                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0"}</li>
+                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DtotalMsgs"]}</li>
+                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"]}</li>
+                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"]}</li>
                           </ul>
                         </td>
                         <td className="center"></td>
-                        <td className="center" style={{width: 65}}>
+                        <td className="center" style={{width: 75}}>
                           <i className="fa fa-floppy-o" /> {this.state["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
                           <i className="fa fa-battery-full" /> {this.state["LatestDisplayRow"]["BatteryLevel"]}
                         </td> 
                       </tr>
-                    <tr className="even gradeC">
+                      <tr className="even gradeC">
                         <td style={{width: 15}}>
                           <a tabIndex={-1} href="#/standardtwo"> <b className="fa fa-cogs" /></a><br />
                           <input type="checkbox" style={{width: 15}} /><br />
-                          <img src= "static/dist/assets/images/green.png" alt="logo" style={{maxWidth: 12}} />
+                          <img src="static/dist/assets/images/green.png" alt="logo" style={{maxWidth: 12}} />
                         </td>
-                        <td style={{width: 205}}>
+                        <td>
                           <ul>
                             <li><b>Uuid:</b> {this.state["LatestDisplayRow"]["Uuid"]}</li>
                             <li><b>Mode:</b> {this.state["LatestDisplayRow"]["Mode"]}</li>
                             <li><b>Name:</b> {this.state["LatestDisplayRow"]["UnitName"]}</li>
+                             <li><b>Reporting Interval:</b> {this.state["LatestDisplayRow"]["ReportingInterval"]}</li>
+                              <li><b>Heart Beat:</b> {this.state["LatestDisplayRow"]["HeartbeatSeconds"]}</li>
                           </ul>   
                         </td>
-                        <td style={{width: 75}}>
+                        <td>
                           <ul>
                             <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["TotalMsgs"]}</li>
                             <li><b>Total Bytes:</b> {this.state["LatestDataVolume"]["UplinkBytes"]}</li>
                             <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["UlastMsgReceived"]}</li>
                           </ul> 
                         </td>
-                        <td className="center" style={{width: 75}}>
+                        <td className="center">
                           <ul>
-                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"}</li>
-                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"}</li>
-                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0"}</li>
+                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DtotalMsgs"]}</li>
+                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"]}</li>
+                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"]}</li>
                           </ul>
                         </td>
-                        <td className="center" style={{width: 25}}>{this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"}</td>
-                        <td className="center" style={{width: 25}}>
-                          {this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"} -
-                          {this.state["LatestDisplayRow"]["DiskSpaceLeft"] ? "" : " 0"}
+                        <td className="center"></td>
+                        <td className="center" style={{width: 65}}>
+                          <i className="fa fa-floppy-o" /> {this.state["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
+                          <i className="fa fa-battery-full" /> {this.state["LatestDisplayRow"]["BatteryLevel"]}
                         </td> 
                       </tr>
                     </tbody>

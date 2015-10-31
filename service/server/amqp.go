@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/streadway/amqp"
+
 	//"gopkg.in/mgo.v2"
 	//"gopkg.in/mgo.v2/bson"
 )
@@ -127,8 +128,10 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 				receivedMsg = true
 				m := AmqpReceiveMessage{}
 				err = json.Unmarshal(msg.Body, &m)
+				log.Printf("MAY BE THERE IS AN ERROR HERE %+v\n", &m)
 				if err == nil {
 					//rec_Collection.Insert(&m)
+					log.Printf("SENDING THE FOLLOWING DOWNLINQ MESSAGE %+v\n")
 					q.Msgs <- &m
 				}
 			case msg = <-responseChan:

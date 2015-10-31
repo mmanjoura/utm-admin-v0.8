@@ -57,6 +57,7 @@ TrafficReportIndUlMsg_t getTrafficReportIndUlMsg(UlMsgUnion_t in)
 */
 import "C"
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
@@ -182,6 +183,9 @@ func decode(data []byte) {
 	nextPointer := (*C.char)(unsafe.Pointer(&data[0]))
 	nextPointerPointer := (**C.char)(unsafe.Pointer(&nextPointer))
 
+	hexBuffer := hex.Dump(data)
+	fmt.Printf("\n\n===>The Whole Input Butter (%s) \n", hexBuffer)
+
 	var decoderCount int
 
 	for {
@@ -220,8 +224,20 @@ func decode(data []byte) {
 			}
 
 		case C.DECODE_RESULT_INTERVALS_GET_CNF_UL_MSG:
-			rawData = C.getIntervalsGetCnfUlMsg(inputBuffer)
-			fmt.Printf("%s RECEIVED INTERVAL REQUEST CONFIRM %s\n", logTag, spew.Sdump(inputBuffer))
+			value := C.getIntervalsGetCnfUlMsg(inputBuffer)
+			rawData = value
+			data = &IntervalsGetCnfUlMsg{
+				ReportingInterval:  uint32(value.reportingInterval),
+				HeartbeatSeconds:   uint32(value.heartbeatSeconds),
+				HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
+			}
+
+			Row.ReportingInterval = uint32(value.reportingInterval)
+			Row.HeartbeatSeconds = uint32(value.heartbeatSeconds)
+			Row.HeartbeatSnapToRtc = bool(value.heartbeatSnapToRtc)
+			multipleRecords = append(multipleRecords, Row)
+
+			fmt.Printf("%s RECEIVED INTERVAL REQUEST CONFIRM %s\n", logTag, spew.Sdump(Row))
 
 		case C.DECODE_RESULT_REPORTING_INTERVAL_SET_CNF_UL_MSG:
 			value := C.getReportingIntervalSetCnfUlMsg(inputBuffer)
@@ -269,23 +285,39 @@ func decode(data []byte) {
 			}
 
 		case C.DECODE_RESULT_TRANSPARENT_UL_DATAGRAM:
+			rawData = "value"
 		case C.DECODE_RESULT_DATE_TIME_IND_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_DATE_TIME_SET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_DATE_TIME_GET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MODE_SET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MODE_GET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:
 			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_CONTROL_GET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_CONTROL_IND_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_CONTROL_DEFAULTS_SET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_TRAFFIC_TEST_MODE_RULE_BREAKER_UL_DATAGRAM:
+			rawData = "value"
 		case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_IND_UL_MSG:
+			rawData = "value"
 		case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_GET_CNF_UL_MSG:
+			rawData = "value"
 
 		default:
 			// Can't decode the uplink; this case is here to avoid a panic,
@@ -375,6 +407,7 @@ func encodeAndEnqueueIntervalGetReq(ueGuid string) error {
 
 		// Send the populated output buffer bytes to NeulNet
 		payload := outputBuffer[:cbytes]
+
 		msg := AmqpMessage{
 			Device_uuid:   ueGuid,
 			Endpoint_uuid: 4,
@@ -393,6 +426,11 @@ func encodeAndEnqueueIntervalGetReq(ueGuid string) error {
 			DownlinkTimestamp: &now,
 			DownlinkBytes:     uint64(len(payload)),
 		}
+
+		//Record in the DisplayRow
+		Row.DtotalMsgs = Row.DtotalMsgs + 1
+		Row.DTotalBytes = Row.DTotalBytes + uint64(len(payload))
+		Row.DlastMsgReceived = &now
 
 		return nil
 	}

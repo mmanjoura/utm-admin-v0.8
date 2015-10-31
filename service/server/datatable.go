@@ -3,8 +3,8 @@ package server
 import (
 	"log"
 
+	"fmt"
 	"github.com/davecgh/go-spew/spew"
-	"time"
 )
 
 type LatestState struct {
@@ -65,6 +65,8 @@ func operateStateTable() {
 
 			case *DataVolume:
 				state.LatestDataVolume = updateDataVolume(state, value)
+				fmt.Printf("\n%s -----## DATA VOLUME STATE ##----- \n\n %s\n\n", logTag, spew.Sdump(state))
+				fmt.Printf("\n%s -----## DATA VOLUME VALUE ##----- \n\n %s\n\n", logTag, spew.Sdump(value))
 
 			case *ReportingIntervalSetCnfUlMsg:
 				state.LatestReportingIntervalSetCnfUlMsg = value.DeepCopy()
@@ -83,7 +85,7 @@ func operateStateTable() {
 				// Duplicate the memory pointed to into a new LatestState struct,
 				//post it and close the channel
 				log.Printf("%s STATE TABLE FETCHING LATEST STATE\n", logTag)
-				time.Sleep(time.Second * 1)
+				// time.Sleep(time.Second * 1)
 				latest := LatestState{}
 				latest.Connection = state.Connection
 				latest.LatestRssi = state.LatestRssi.DeepCopy()

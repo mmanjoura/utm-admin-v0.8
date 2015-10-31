@@ -43,8 +43,7 @@ extern "C" {
 #define DEFAULT_REPORTING_INTERVAL 1
 
 /// How often the UTM wakes-up to take measurements.
-//#define DEFAULT_HEARTBEAT_SECONDS   900
-#define DEFAULT_HEARTBEAT_SECONDS   20
+#define DEFAULT_HEARTBEAT_SECONDS   900
 
 /// The maximum size of the traffic test rule breaker datagram.
 #define TRAFFIC_TEST_MODE_RULE_BREAKER_MAX_LENGTH 100
@@ -1246,8 +1245,9 @@ uint32_t logTrafficTestModeRuleBreakerDatagram (char * pBuffer, uint32_t *pBuffe
 // will be modified on exit to reflect the bytes used.
 // \param totalTransmitMilliseconds how long the module has been on for transmit.
 // \param totalReceiveMilliseconds  how long the module has been on for receive.
+// \param upTimeSeconds the time that the UTM has been up for.
 // \return the number of bytes used to code the message.
-uint32_t logActivityReport (char * pBuffer, uint32_t *pBufferSize, uint32_t totalTransmitMilliseconds, uint32_t totalReceiveMilliseconds);
+uint32_t logActivityReport(char * pBuffer, uint32_t *pBufferSize, uint32_t totalTransmitMilliseconds, uint32_t totalReceiveMilliseconds, uint32_t upTimeSeconds);
 
 /// Log a string from a DebugInd message
 // \param pBuffer  a pointer to the logging buffer.

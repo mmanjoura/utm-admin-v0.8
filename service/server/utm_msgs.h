@@ -296,9 +296,6 @@ typedef struct InitIndUlMsgTag_t
     WakeUpCode_t wakeUpCode;         //!< A wake-up code from the UTM.
     uint8_t      revisionLevel;      //!< Revision level of this messaging protocol.
     bool         sdCardNotRequired;  //!< If true the UTM will ignore SD card errors.
-    bool         minimalLedDelay;    //!< If true the UTM is minimising LED delay in
-                                     //! favour of most rapid hearbeat.  The LED
-                                     //! will no longer be useful to the user.
     bool         disableModemDebug;  //!< If true then modem debug is not being
                                      //! written to SD card, saving heartbeat time.
     bool         disableButton;      //!< If true then the button on the side of the
@@ -313,13 +310,6 @@ typedef struct RebootReqDlMsgTag_t
 {
     bool sdCardNotRequired; //!< If true SD card errors are ignored,
                             //! the UTM can run without one.
-    bool minimalLedDelay;   //!< By default the UTM flashes an LED,
-                            //! to give user feedback and, in order to
-                            //! be visible to the user this take time.
-                            //! If this flag is set then this restriction
-                            //! is removed and the UTM's heart can beat
-                            //! faster.  NOTE however that the LED will
-                            //! no longer be very helpful to the user.
     bool disableModemDebug; //!< By default the UTM writes all the modem
                             //! debug it can to SD card.  This may take
                             //! time and disk space.  If this flag is set
@@ -644,6 +634,7 @@ typedef struct ActivityReportIndUlMsgTag_t
 {
     uint32_t totalTransmitMilliseconds;
     uint32_t totalReceiveMilliseconds;
+    uint32_t upTimeSeconds;
 } ActivityReportIndUlMsg_t;
 
 /// ActivityReportGetReqDlMsg_t.  Request an activity report.
@@ -656,6 +647,7 @@ typedef struct ActivityReportGetCnfUlMsgTag_t
 {
     uint32_t totalTransmitMilliseconds;
     uint32_t totalReceiveMilliseconds;
+    uint32_t upTimeSeconds;
 } ActivityReportGetCnfUlMsg_t;
 
 // ----------------------------------------------------------------

@@ -5,19 +5,22 @@ import (
 )
 
 type DisplayRow struct {
-	TotalMsgs        uint64     `json:"TotalMsgs,omitempty"`
-	Uuid             string     `json:"Uuid,omitempty"`
-	UnitName         string     `json:"UnitName, omitempty"`
-	Mode             string     `json:"Mode, omitempty"`
-	UTotalMsgs       uint64     `json:"UTotalMsgs, omitempty"`
-	UTotalBytes      uint64     `json:"UTotalBytes, omitempty"`
-	UlastMsgReceived *time.Time `json:"UlastMsgReceived, omitempty"`
-	DtotalMsgs       uint64     `json:"DtotalMsgs, omitempty"`
-	DTotalBytes      uint64     `json:"DTotalBytes, omitempty"`
-	DlastMsgReceived *time.Time `json:"DlastMsgReceived, omitempty"`
-	RSRP             int32      `json:"RSRP, omitempty"`
-	BatteryLevel     string     `json:"BatteryLevel, omitempty"`
-	DiskSpaceLeft    string     `json:"DiskSpaceLeft, omitempty"`
+	TotalMsgs          uint64     `json:"TotalMsgs,omitempty"`
+	Uuid               string     `json:"Uuid,omitempty"`
+	UnitName           string     `json:"UnitName, omitempty"`
+	Mode               string     `json:"Mode, omitempty"`
+	UTotalMsgs         uint64     `json:"UTotalMsgs, omitempty"`
+	UTotalBytes        uint64     `json:"UTotalBytes, omitempty"`
+	UlastMsgReceived   *time.Time `json:"UlastMsgReceived, omitempty"`
+	DtotalMsgs         uint64     `json:"DtotalMsgs, omitempty"`
+	DTotalBytes        uint64     `json:"DTotalBytes, omitempty"`
+	DlastMsgReceived   *time.Time `json:"DlastMsgReceived, omitempty"`
+	RSRP               int32      `json:"RSRP, omitempty"`
+	BatteryLevel       string     `json:"BatteryLevel, omitempty"`
+	DiskSpaceLeft      string     `json:"DiskSpaceLeft, omitempty"`
+	ReportingInterval  uint32     `json:"ReportingInterval, omitempty"`
+	HeartbeatSeconds   uint32     `json:"HeartbeatSeconds, omitempty"`
+	HeartbeatSnapToRtc bool       `json:"HeartbeatSnapToRtc, omitempty"`
 }
 
 type Connection struct {
@@ -60,9 +63,9 @@ type InitIndUlMsg struct {
 	sdCardNotRequired bool
 }
 type IntervalsGetCnfUlMsg struct {
-	reportingInterval  int32
-	heartbeatSeconds   int32
-	heartbeatSnapToRtc bool
+	ReportingInterval  uint32
+	HeartbeatSeconds   uint32
+	HeartbeatSnapToRtc bool
 }
 
 type ReportingIntervalSetCnfUlMsg struct {
@@ -212,6 +215,18 @@ func (value *PollIndUlMsg) DeepCopy() *PollIndUlMsg {
 	return result
 }
 
+func (value *IntervalsGetCnfUlMsg) DeepCopy() *IntervalsGetCnfUlMsg {
+	if value == nil {
+		return nil
+	}
+	result := &IntervalsGetCnfUlMsg{
+		ReportingInterval:  value.ReportingInterval,
+		HeartbeatSeconds:   value.HeartbeatSeconds,
+		HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
+	}
+	return result
+}
+
 func (value *ReportingIntervalSetCnfUlMsg) DeepCopy() *ReportingIntervalSetCnfUlMsg {
 	if value == nil {
 		return nil
@@ -228,19 +243,22 @@ func (value *DisplayRow) DeepCopy() *DisplayRow {
 		return nil
 	}
 	result := &DisplayRow{
-		TotalMsgs:        value.TotalMsgs,
-		Uuid:             value.Uuid,
-		UnitName:         value.UnitName,
-		Mode:             value.Mode,
-		UTotalMsgs:       value.UTotalMsgs,
-		UTotalBytes:      value.UTotalBytes,
-		UlastMsgReceived: value.UlastMsgReceived,
-		DtotalMsgs:       value.DtotalMsgs,
-		DTotalBytes:      value.DTotalBytes,
-		DlastMsgReceived: value.DlastMsgReceived,
-		RSRP:             value.RSRP,
-		BatteryLevel:     value.BatteryLevel,
-		DiskSpaceLeft:    value.DiskSpaceLeft,
+		TotalMsgs:          value.TotalMsgs,
+		Uuid:               value.Uuid,
+		UnitName:           value.UnitName,
+		Mode:               value.Mode,
+		UTotalMsgs:         value.UTotalMsgs,
+		UTotalBytes:        value.UTotalBytes,
+		UlastMsgReceived:   value.UlastMsgReceived,
+		DtotalMsgs:         value.DtotalMsgs,
+		DTotalBytes:        value.DTotalBytes,
+		DlastMsgReceived:   value.DlastMsgReceived,
+		RSRP:               value.RSRP,
+		BatteryLevel:       value.BatteryLevel,
+		DiskSpaceLeft:      value.DiskSpaceLeft,
+		ReportingInterval:  value.ReportingInterval,
+		HeartbeatSeconds:   value.HeartbeatSeconds,
+		HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
 	}
 	return result
 }

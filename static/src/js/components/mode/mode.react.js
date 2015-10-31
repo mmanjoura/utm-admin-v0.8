@@ -300,31 +300,4 @@ var Mode = React.createClass({
   }
 });
 
-function formatTime(ts) {
-  if (ts != null) {
-    var i = ts.indexOf(".");
-    return ts.substr(0, i).replace("T", " ");
-  }
-
-}
-
-function pollState(updateState) {
-  function pollLoop() {
-    var x = new XMLHttpRequest();
-    x.onreadystatechange = function() {
-      if (x.readyState == 4) {
-        if (x.status == 200) {
-          var state = JSON.parse(x.responseText);
-         
-          updateState(state);
-        }
-        window.setTimeout(pollLoop, 1000);
-      }
-    };
-
-    x.open("GET", "latestState", true);
-    x.send();
-  }
-  pollLoop();
-}
 module.exports = Mode;

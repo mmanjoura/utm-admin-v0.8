@@ -22663,8 +22663,8 @@ var Display = React.createClass({displayName: "Display",
         "LatestPowerState": {},
         "LatestPowerStateDisplay": {},
         "LatestDataVolume": {},
-        "LatestDisplayRow": {},
-        "Device_Setting" : {}
+        "LatestDisplayRow": {}
+    
     
     };
 
@@ -22760,7 +22760,9 @@ var Display = React.createClass({displayName: "Display",
                           React.createElement("ul", null, 
                             React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", this.state["LatestDisplayRow"]["Uuid"]), 
                             React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.state["LatestDisplayRow"]["Mode"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"])
+                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"]), 
+                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", this.state["LatestDisplayRow"]["ReportingInterval"]), 
+                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", this.state["LatestDisplayRow"]["HeartbeatSeconds"])
                           )
                         ), 
                         React.createElement("td", null, 
@@ -22772,48 +22774,50 @@ var Display = React.createClass({displayName: "Display",
                         ), 
                         React.createElement("td", {className: "center"}, 
                           React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0")
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DtotalMsgs"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"])
                           )
                         ), 
                         React.createElement("td", {className: "center"}), 
-                        React.createElement("td", {className: "center", style: {width: 65}}, 
+                        React.createElement("td", {className: "center", style: {width: 75}}, 
                           React.createElement("i", {className: "fa fa-floppy-o"}), " ", this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
                           React.createElement("i", {className: "fa fa-battery-full"}), " ", this.state["LatestDisplayRow"]["BatteryLevel"]
                         )
                       ), 
-                    React.createElement("tr", {className: "even gradeC"}, 
+                      React.createElement("tr", {className: "even gradeC"}, 
                         React.createElement("td", {style: {width: 15}}, 
                           React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
                           React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
                           React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
                         ), 
-                        React.createElement("td", {style: {width: 205}}, 
+                        React.createElement("td", null, 
                           React.createElement("ul", null, 
                             React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", this.state["LatestDisplayRow"]["Uuid"]), 
                             React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.state["LatestDisplayRow"]["Mode"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"])
+                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"]), 
+                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", this.state["LatestDisplayRow"]["ReportingInterval"]), 
+                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", this.state["LatestDisplayRow"]["HeartbeatSeconds"])
                           )
                         ), 
-                        React.createElement("td", {style: {width: 75}}, 
+                        React.createElement("td", null, 
                           React.createElement("ul", null, 
                             React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["TotalMsgs"]), 
                             React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDataVolume"]["UplinkBytes"]), 
                             React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["UlastMsgReceived"])
                           )
                         ), 
-                        React.createElement("td", {className: "center", style: {width: 75}}, 
+                        React.createElement("td", {className: "center"}, 
                           React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "0"), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "0"), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "0")
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DtotalMsgs"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"])
                           )
                         ), 
-                        React.createElement("td", {className: "center", style: {width: 25}}, this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"), 
-                        React.createElement("td", {className: "center", style: {width: 25}}, 
-                          this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0", " -", 
-                          this.state["LatestDisplayRow"]["DiskSpaceLeft"] ? "" : " 0"
+                        React.createElement("td", {className: "center"}), 
+                        React.createElement("td", {className: "center", style: {width: 65}}, 
+                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
+                          React.createElement("i", {className: "fa fa-battery-full"}), " ", this.state["LatestDisplayRow"]["BatteryLevel"]
                         )
                       )
                     )
@@ -23245,33 +23249,6 @@ var Mode = React.createClass({displayName: "Mode",
   }
 });
 
-function formatTime(ts) {
-  if (ts != null) {
-    var i = ts.indexOf(".");
-    return ts.substr(0, i).replace("T", " ");
-  }
-
-}
-
-function pollState(updateState) {
-  function pollLoop() {
-    var x = new XMLHttpRequest();
-    x.onreadystatechange = function() {
-      if (x.readyState == 4) {
-        if (x.status == 200) {
-          var state = JSON.parse(x.responseText);
-         
-          updateState(state);
-        }
-        window.setTimeout(pollLoop, 1000);
-      }
-    };
-
-    x.open("GET", "latestState", true);
-    x.send();
-  }
-  pollLoop();
-}
 module.exports = Mode;
 
 },{"../controls/setting.react":196,"react":188}],200:[function(require,module,exports){

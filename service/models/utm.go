@@ -16,7 +16,7 @@ type Uuid struct {
 type AmqpMessage struct {
 	Device_uuid   string `bson:"device_uuid" json:"device_uuid"`
 	Endpoint_uuid int    `bson:"endpoint_uuid" json:"endpoint_uuid"`
-	Payload       []int  `bson:"payload json:"payload"`
+	Payload       []byte `bson:"payload json:"payload"`
 }
 
 type AmqpReceiveMessage struct {
