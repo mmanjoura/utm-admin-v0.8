@@ -266,7 +266,7 @@ func decode(data []byte) {
 
 			multipleRecords = append(multipleRecords, Row)
 
-			encodeAndEnqueueIntervalGetReq(Row.Uuid)
+			//encodeAndEnqueueIntervalGetReq(Row.Uuid)
 
 		case C.DECODE_RESULT_DEBUG_IND_UL_MSG:
 			rawData = C.getDebugIndUlMsg(inputBuffer)

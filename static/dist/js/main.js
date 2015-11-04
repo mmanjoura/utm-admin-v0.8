@@ -22720,8 +22720,8 @@ var Display = React.createClass({displayName: "Display",
               React.createElement("div", {className: "panel-body"}, 
                 React.createElement("p", {style: {fontStyle: 'italic'}}, 
                   React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.state["LatestDisplayRow"]["TotalMsgs"]), React.createElement("br", null), 
-                  React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDataVolume"]["UplinkBytes"], React.createElement("br", null), 
-                  React.createElement("b", null, "Last Msg:"), "    ", this.state["LatestDisplayRow"]["UlastMsgReceived"], React.createElement("br", null)
+                  React.createElement("b", null, "Total Bytes:"), React.createElement("span", {className: "resetColor"}, "  ", this.state["LatestDataVolume"]["UplinkBytes"]), React.createElement("br", null), 
+                  React.createElement("b", null, "Last Msg:"), " ", React.createElement("span", {className: "resetColor"}, "    ", this.state["LatestDisplayRow"]["UlastMsgReceived"]), React.createElement("br", null)
                 )
               )
             )
@@ -22758,7 +22758,7 @@ var Display = React.createClass({displayName: "Display",
                         ), 
                         React.createElement("td", null, 
                           React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", this.state["LatestDisplayRow"]["Uuid"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), this.state["LatestDisplayRow"]["Uuid"]), 
                             React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.state["LatestDisplayRow"]["Mode"]), 
                             React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"]), 
                              React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", this.state["LatestDisplayRow"]["ReportingInterval"]), 

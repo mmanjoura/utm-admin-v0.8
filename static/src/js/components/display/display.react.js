@@ -86,8 +86,8 @@ var Display = React.createClass({
               <div className="panel-body">
                 <p style={{fontStyle: 'italic'}}>
                   <b>Total Msg:</b> <span className="resetColor">  {this.state["LatestDisplayRow"]["TotalMsgs"]}</span><br />
-                  <b>Total Bytes:</b> {this.state["LatestDataVolume"]["UplinkBytes"]}<br />
-                  <b>Last Msg:</b>    {this.state["LatestDisplayRow"]["UlastMsgReceived"]}<br />
+                  <b>Total Bytes:</b><span className="resetColor">  {this.state["LatestDataVolume"]["UplinkBytes"]}</span><br />
+                  <b>Last Msg:</b> <span className="resetColor">    {this.state["LatestDisplayRow"]["UlastMsgReceived"]}</span><br />
                 </p> 
               </div>
             </div>
@@ -124,7 +124,7 @@ var Display = React.createClass({
                         </td>
                         <td>
                           <ul>
-                            <li><b>Uuid:</b> {this.state["LatestDisplayRow"]["Uuid"]}</li>
+                            <li><b>Uuid:</b>{this.state["LatestDisplayRow"]["Uuid"]}</li>
                             <li><b>Mode:</b> {this.state["LatestDisplayRow"]["Mode"]}</li>
                             <li><b>Name:</b> {this.state["LatestDisplayRow"]["UnitName"]}</li>
                              <li><b>Reporting Interval:</b> {this.state["LatestDisplayRow"]["ReportingInterval"]}</li>
