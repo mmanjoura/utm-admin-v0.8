@@ -92,21 +92,21 @@ type DataVolume struct {
 	DownlinkBytes     uint64
 }
 
-// type Measurements struct {
-// 	time                int32 //!< Time in UTC seconds.
-// 	gnssPositionPresent bool
-// 	gnssPosition        GnssPosition
-// 	cellIdPresent       bool
-// 	cellId              uint16
-// 	rsrpPresent         bool
-// 	rsrp                Rsrp
-// 	rssiPresent         bool
-// 	rssi                int32
-// 	temperaturePresent  bool
-// 	temperature         int8
-// 	powerStatePresent   bool
-// 	powerState          PowerState
-// }
+type Measurements struct {
+	time                int32 //!< Time in UTC seconds.
+	gnssPositionPresent bool
+	//gnssPosition        GnssPosition
+	cellIdPresent      bool
+	cellId             uint16
+	rsrpPresent        bool
+	rsrp               interface{}
+	rssiPresent        bool
+	rssi               interface{}
+	temperaturePresent bool
+	temperature        int8
+	powerStatePresent  bool
+	//powerState          PowerState
+}
 
 // type PowerState struct {
 // 	//ChargerState ChargeStateEnumDisplay
@@ -120,13 +120,13 @@ type DataVolume struct {
 // 	elevation int32 //!< In metres
 // }
 
-// type Rsrp struct {
-// 	value            int16 //!< The RSRP value in 10ths of a dBm.
-// 	isSyncedWithRssi bool  //!< If true then the RSRP value was
-// 	//! taken at the same time as the RSSI
-// 	//! value in a report.  In this case
-// 	//! SNR can be computed.
-// }
+type Rsrp struct {
+	value            int16 //!< The RSRP value in 10ths of a dBm.
+	isSyncedWithRssi bool  //!< If true then the RSRP value was
+	//! taken at the same time as the RSSI
+	//! value in a report.  In this case
+	//! SNR can be computed.
+}
 
 func (value *DataVolume) DeepCopy() *DataVolume {
 	if value == nil {

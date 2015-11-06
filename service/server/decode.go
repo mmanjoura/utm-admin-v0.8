@@ -46,9 +46,14 @@ TrafficReportGetCnfUlMsg_t getTrafficReportGetCnfUlMsg(UlMsgUnion_t in)
 	return in.trafficReportGetCnfUlMsg;
 }
 
+
 MeasurementsIndUlMsg_t getMeasurementsIndUlMsg(UlMsgUnion_t in)
 {
 	return in.measurementsIndUlMsg;
+}
+MeasurementsControlIndUlMsg_t getMeasurementsControlIndUlMsg(UlMsgUnion_t in)
+{
+	return in.measurementsControlIndUlMsg;
 }
 TrafficReportIndUlMsg_t getTrafficReportIndUlMsg(UlMsgUnion_t in)
 {
@@ -266,7 +271,7 @@ func decode(data []byte) {
 
 			multipleRecords = append(multipleRecords, Row)
 
-			//encodeAndEnqueueIntervalGetReq(Row.Uuid)
+			encodeAndEnqueueIntervalGetReq(Row.Uuid)
 
 		case C.DECODE_RESULT_DEBUG_IND_UL_MSG:
 			rawData = C.getDebugIndUlMsg(inputBuffer)
@@ -299,7 +304,9 @@ func decode(data []byte) {
 		case C.DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG:
 			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:
-			rawData = "value"
+			value := C.getMeasurementsIndUlMsg(inputBuffer)
+			rawData = value
+			Row.RSRP = int32(value.measurements.rsrp.value)
 		case C.DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG:
 			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_CONTROL_GET_CNF_UL_MSG:

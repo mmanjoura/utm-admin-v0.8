@@ -22714,6 +22714,7 @@ var Display = React.createClass({displayName: "Display",
         React.createElement("div", {className: "row"}, React.createElement("br", null), 
          React.createElement(Configure, null), 
           /* /.col-lg-4 */
+          React.createElement(Hint, null), 
           React.createElement("div", {className: "col-lg-4"}, 
             /* TrxSummary */
             React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350}}, 
@@ -22725,9 +22726,9 @@ var Display = React.createClass({displayName: "Display",
                 )
               )
             )
-          ), 
-        React.createElement(Hint, null)
-          /* /.col-lg-12 */
+          )
+        
+  
         ), 
         /* /.row */
         React.createElement("div", {className: "row"}, 
@@ -22741,8 +22742,8 @@ var Display = React.createClass({displayName: "Display",
                       React.createElement("tr", {className: "info"}, 
                         React.createElement("th", null, " ", React.createElement("input", {type: "checkbox", style: {width: 15}}), " All"), 
                         React.createElement("th", null, "Name/Uuid"), 
-                       React.createElement("th", null, "Upstream"), 
-                        React.createElement("th", null, "Downsteam"), 
+                       React.createElement("th", null, "Uplink"), 
+                        React.createElement("th", null, "Downlink"), 
                         React.createElement("th", null, "RSRP "), 
                         React.createElement("th", null, 
                           "Others"
@@ -22757,7 +22758,7 @@ var Display = React.createClass({displayName: "Display",
                           React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
                         ), 
                         React.createElement("td", null, 
-                          React.createElement("ul", null, 
+                          React.createElement("ul", {className: "SmallPadding"}, 
                             React.createElement("li", null, React.createElement("b", null, "Uuid:"), this.state["LatestDisplayRow"]["Uuid"]), 
                             React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.state["LatestDisplayRow"]["Mode"]), 
                             React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"]), 
@@ -22766,58 +22767,23 @@ var Display = React.createClass({displayName: "Display",
                           )
                         ), 
                         React.createElement("td", null, 
-                          React.createElement("ul", null, 
+                          React.createElement("ul", {className: "SmallPadding"}, 
                             React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["TotalMsgs"]), 
                             React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDataVolume"]["UplinkBytes"]), 
                             React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["UlastMsgReceived"])
                           )
                         ), 
                         React.createElement("td", {className: "center"}, 
-                          React.createElement("ul", null, 
+                          React.createElement("ul", {className: "SmallPadding"}, 
                             React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DtotalMsgs"]), 
                             React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"]), 
                             React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"])
                           )
                         ), 
-                        React.createElement("td", {className: "center"}), 
-                        React.createElement("td", {className: "center", style: {width: 75}}, 
-                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
-                          React.createElement("i", {className: "fa fa-battery-full"}), " ", this.state["LatestDisplayRow"]["BatteryLevel"]
-                        )
-                      ), 
-                      React.createElement("tr", {className: "even gradeC"}, 
-                        React.createElement("td", {style: {width: 15}}, 
-                          React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
-                          React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
-                          React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
-                        ), 
-                        React.createElement("td", null, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", this.state["LatestDisplayRow"]["Uuid"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.state["LatestDisplayRow"]["Mode"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"]), 
-                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", this.state["LatestDisplayRow"]["ReportingInterval"]), 
-                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", this.state["LatestDisplayRow"]["HeartbeatSeconds"])
-                          )
-                        ), 
-                        React.createElement("td", null, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["TotalMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDataVolume"]["UplinkBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["UlastMsgReceived"])
-                          )
-                        ), 
-                        React.createElement("td", {className: "center"}, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DtotalMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"])
-                          )
-                        ), 
-                        React.createElement("td", {className: "center"}), 
-                        React.createElement("td", {className: "center", style: {width: 65}}, 
-                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
-                          React.createElement("i", {className: "fa fa-battery-full"}), " ", this.state["LatestDisplayRow"]["BatteryLevel"]
+                        React.createElement("td", {className: "center"}, this.state["LatestDisplayRow"]["RSRP"]), 
+                        React.createElement("td", {className: "center", style: {width: 105}}, 
+                          React.createElement("i", {className: "fa fa-floppy-o"}), " ",  this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
+                          React.createElement("i", {className: "fa fa-battery-full"}), " ",  this.state["LatestDisplayRow"]["BatteryLevel"]
                         )
                       )
                     )
@@ -23265,7 +23231,7 @@ var Configure = React.createClass({displayName: "Configure",
                   React.createElement(Link, {href: "/mode"}, 
                     React.createElement("b", {className: "fa fa-cogs  fa-2x"})
                   ), 
-                  React.createElement("b", {style: {float: 'right'}}, "Configures Ticked")
+                  React.createElement("b", {style: {float: 'right'}}, "Configure Ticked")
                 )
               )
             )
@@ -23282,16 +23248,8 @@ var React = require('react');
 var Hint = React.createClass({displayName: "Hint",
   render:function(){
     return (
-    		React.createElement("div", {className: "col-lg-4"}, 
-            /* Hint */
-            React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 300}}, 
-              React.createElement("div", {className: "panel-body"}, 
-                React.createElement("p", null, 
-                    "There are more options / setting for individual UTM. They can be access through the following icon" + ' ' + 
-                   " ", React.createElement("b", {className: "fa fa-cogs"}), " in the table below."                  
-                )
-              )
-            )
+    		React.createElement("div", {className: "col-lg-4"}
+
           )
      
     );

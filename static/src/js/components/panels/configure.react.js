@@ -11,7 +11,7 @@ var Configure = React.createClass({
                   <Link href="/mode">
                     <b className="fa fa-cogs  fa-2x" />
                   </Link>
-                  <b style={{float: 'right'}}>Configures Ticked</b>               
+                  <b style={{float: 'right'}}>Configure Ticked</b>               
                 </p>
               </div>
             </div>
