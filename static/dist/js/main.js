@@ -22717,7 +22717,7 @@ var Display = React.createClass({displayName: "Display",
           React.createElement(Hint, null), 
           React.createElement("div", {className: "col-lg-4"}, 
             /* TrxSummary */
-            React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350}}, 
+            React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 400}}, 
               React.createElement("div", {className: "panel-body"}, 
                 React.createElement("p", {style: {fontStyle: 'italic'}}, 
                   React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.state["LatestDisplayRow"]["TotalMsgs"]), React.createElement("br", null), 

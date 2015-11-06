@@ -83,7 +83,7 @@ var Display = React.createClass({
           <Hint />
           <div className="col-lg-4">
             {/* TrxSummary */}
-            <div className="panel panel-info" style={{height: 110, width: 350}}>
+            <div className="panel panel-info" style={{height: 110, width: 400}}>
               <div className="panel-body">
                 <p style={{fontStyle: 'italic'}}>
                   <b>Total Msg:</b> <span className="resetColor">  {this.state["LatestDisplayRow"]["TotalMsgs"]}</span><br />
