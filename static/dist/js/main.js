@@ -22782,8 +22782,8 @@ var Display = React.createClass({displayName: "Display",
                         ), 
                         React.createElement("td", {className: "center"}, this.state["LatestDisplayRow"]["RSRP"]), 
                         React.createElement("td", {className: "center", style: {width: 105}}, 
-                          React.createElement("i", {className: "fa fa-floppy-o"}), " ",  this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
-                          React.createElement("i", {className: "fa fa-battery-full"}), " ",  this.state["LatestDisplayRow"]["BatteryLevel"]
+                          React.createElement("i", {className: "fa fa-floppy-o"}), "  ",  this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
+                          React.createElement("i", {className: "fa fa-battery-full"}), "  ",  this.state["LatestDisplayRow"]["BatteryLevel"]
                         )
                       )
                     )

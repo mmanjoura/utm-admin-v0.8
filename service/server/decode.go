@@ -196,7 +196,7 @@ func decode(data []byte) {
 	for {
 		decoderCount = decoderCount + 1
 		TotalMsgs = TotalMsgs + 1
-		fmt.Println()
+
 		fmt.Printf("\n\n===>DECODING MESSAGE NO (%v)  OF AMQP DATAGRAM NO (%v) \n", decoderCount, amqpCount)
 
 		fmt.Printf("\n%s -----## SHOW BUFFER DATA ##----- \n\n %s\n\n", logTag, spew.Sdump(inputBuffer))
@@ -306,7 +306,7 @@ func decode(data []byte) {
 		case C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:
 			value := C.getMeasurementsIndUlMsg(inputBuffer)
 			rawData = value
-			Row.RSRP = int32(value.measurements.rsrp.value)
+			Row.RSRP = int32(value.measurements.rsrp.value) / 10
 		case C.DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG:
 			rawData = "value"
 		case C.DECODE_RESULT_MEASUREMENTS_CONTROL_GET_CNF_UL_MSG:

@@ -148,8 +148,8 @@ var Display = React.createClass({
                         </td>
                         <td className="center">{this.state["LatestDisplayRow"]["RSRP"]}</td>
                         <td className="center" style={{width: 105}}>
-                          <i className="fa fa-floppy-o" /> { this.state["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
-                          <i className="fa fa-battery-full" /> { this.state["LatestDisplayRow"]["BatteryLevel"]}
+                          <i className="fa fa-floppy-o" />&nbsp; { this.state["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
+                          <i className="fa fa-battery-full" />&nbsp; { this.state["LatestDisplayRow"]["BatteryLevel"]}
                         </td> 
                       </tr>
                     </tbody>

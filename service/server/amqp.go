@@ -50,6 +50,7 @@ type Queue struct {
 
 var TotalMsgs uint64
 var Row = &DisplayRow{}
+var RowsList = make([]*DisplayRow, 1)
 
 func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery, error) {
 	msgChan, err := channel.Consume(
@@ -190,4 +191,15 @@ func (q *Queue) Close() {
 	// FIXME: maybe dont need a quit chan... can get EOF info from AMQP chans somehow.
 	q.conn.Close()
 	close(q.quit)
+}
+
+func AddUuidToList(row *DisplayRow) {
+	for i, v := range RowsList {
+		if v.Uuid == row.Uuid {
+			//remove
+			RowsList = append(RowsList[:i], RowsList[i+1:]...)
+		}
+		//Add
+		RowsList = append(RowsList, row)
+	}
 }

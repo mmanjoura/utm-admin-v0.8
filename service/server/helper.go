@@ -8,20 +8,20 @@ var ModeLookUp = map[string]string{
 }
 
 var DiskSpaceLookUP = map[int]string{
-	0: " less 1GB",
-	1: " more 1GB",
-	2: " more 2GB",
-	3: " more 4GB",
+	0: " < 1GB",
+	1: " > 1GB",
+	2: " > 2GB",
+	3: " > 4GB",
 	4: " max",
 }
 
 var EnergyLeftLookUP = map[int]string{
-	0: " less 5%",
-	1: " less 10%",
-	2: " more 20%",
-	3: " more 30%",
-	4: " more 50%",
-	5: " more 70%",
-	6: " more 90%",
+	0: " > 5%",
+	1: " < 10%",
+	2: " > 20%",
+	3: " > 30%",
+	4: " > 50%",
+	5: " > 70%",
+	6: " > 90%",
 	7: " max left",
 }
