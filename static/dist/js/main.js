@@ -22647,33 +22647,19 @@ var DisplayRow = require('./displayRow.react')
 
 var Link = require('react-router-component').Link
 
+var arrData = [];
+
+var currentUuidsObject = new Object();
+var UuidsMap = new Map();
+var totalMsg = 0;
+var totalBytes = 0;
 
 var Display = React.createClass({displayName: "Display",
 
-    getInitialState: function(){   
+   getInitialState: function(){   
 
-      var data = {
-
-        "Connection": {},
-        "LatestGpsPosition": {},
-        "LatestLclPosition": {},
-        "LatestLclPositionDisplay": {},
-        "LatestRssi": {},
-        "LatestRssiDisplay": {},
-        "LatestPowerState": {},
-        "LatestPowerStateDisplay": {},
-        "LatestDataVolume": {},
-        "LatestDisplayRow": {}
-    
-    
-    };
-
-    if (window.location.hash == "#debug") {
-      data.json = JSON.stringify(data, null, "  ");
-    } else {
-      data.json = "";
-    }
-    return data;
+      var data = {data:[
+        ]}    
 
       return data;
   },
@@ -22702,104 +22688,46 @@ var Display = React.createClass({displayName: "Display",
       } else {
         data.json = "";
       }
-      this.setState(data);
+
+      var currentUuIdkey = data["LatestDisplayRow"]["Uuid"];
+
+      currentUuidsObject[data["LatestDisplayRow"]["Uuid"]] = data;
+      UuidsMap.set(data["LatestDisplayRow"]["Uuid"], data);
+
+
+
+      if (!(currentUuIdkey in currentUuidsObject)){
+        
+        if(currentUuIdkey !== undefined){
+              if(currentUuIdkey.length > 0){
+               // data["LatestDisplayRow"]["TotalMsg"] = data["LatestDisplayRow"]["TotalMsg"] + data["LatestDisplayRow"]["UTotalMsg"] + data["LatestDisplayRow"]["DTotalMsg"] 
+                console.log(data["LatestDisplayRow"]["TotalMsg"]);
+                currentUuidsObject[currentUuIdkey] = data;
+                UuidsMap.set(currentUuIdkey, data);
+              }
+        }
+    
+        
+      }
+
+     // arrData.push(data);
+      this.setState({data: UuidsMap})
+
     }.bind(this), 10000);
+
   },
 
   render:function(){
-
     return (
-      React.createElement("div", {className: "row"}, 
-      React.createElement("div", null, 
-        React.createElement("div", {className: "row"}, React.createElement("br", null), 
-         React.createElement(Configure, null), 
-          /* /.col-lg-4 */
-          React.createElement(Hint, null), 
-          React.createElement("div", {className: "col-lg-4"}, 
-            /* TrxSummary */
-            React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 400}}, 
-              React.createElement("div", {className: "panel-body"}, 
-                React.createElement("p", {style: {fontStyle: 'italic'}}, 
-                  React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.state["LatestDisplayRow"]["TotalMsgs"]), React.createElement("br", null), 
-                  React.createElement("b", null, "Total Bytes:"), React.createElement("span", {className: "resetColor"}, "  ", this.state["LatestDataVolume"]["UplinkBytes"]), React.createElement("br", null), 
-                  React.createElement("b", null, "Last Msg:"), " ", React.createElement("span", {className: "resetColor"}, "    ", this.state["LatestDisplayRow"]["UlastMsgReceived"]), React.createElement("br", null)
-                )
-              )
+            React.createElement("div", null, React.createElement("br", null), 
+              React.createElement(Configure, null), 
+              React.createElement(Summary, {data:  this.state.data}), 
+              React.createElement(Hint, null), 
+              React.createElement(DisplayRow, {data:  this.state.data})
             )
-          )
-        
-  
-        ), 
-        /* /.row */
-        React.createElement("div", {className: "row"}, 
-          React.createElement("div", {className: "panel panel-default"}, 
-            React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
-              /* /.panel-heading */
-              React.createElement("div", {className: "panel-body"}, 
-                React.createElement("div", {className: "dataTable_wrapper"}, 
-                  React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
-                    React.createElement("thead", null, 
-                      React.createElement("tr", {className: "info"}, 
-                        React.createElement("th", null, " ", React.createElement("input", {type: "checkbox", style: {width: 15}}), " All"), 
-                        React.createElement("th", null, "Name/Uuid"), 
-                       React.createElement("th", null, "Uplink"), 
-                        React.createElement("th", null, "Downlink"), 
-                        React.createElement("th", null, "RSRP "), 
-                        React.createElement("th", null, 
-                          "Others"
-                        )
-                      )
-                    ), 
-                    React.createElement("tbody", {style: {fontSize: 12}}, 
-                      React.createElement("tr", {className: "even gradeA"}, 
-                        React.createElement("td", {style: {width: 15}}, 
-                          React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
-                          React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
-                          React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
-                        ), 
-                        React.createElement("td", null, 
-                          React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), this.state["LatestDisplayRow"]["Uuid"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.state["LatestDisplayRow"]["Mode"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.state["LatestDisplayRow"]["UnitName"]), 
-                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", this.state["LatestDisplayRow"]["ReportingInterval"]), 
-                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", this.state["LatestDisplayRow"]["HeartbeatSeconds"])
-                          )
-                        ), 
-                        React.createElement("td", null, 
-                          React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["TotalMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDataVolume"]["UplinkBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["UlastMsgReceived"])
-                          )
-                        ), 
-                        React.createElement("td", {className: "center"}, 
-                          React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.state["LatestDisplayRow"]["DtotalMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.state["LatestDisplayRow"]["DTotalBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.state["LatestDisplayRow"]["DlastMsgReceived"])
-                          )
-                        ), 
-                        React.createElement("td", {className: "center"}, this.state["LatestDisplayRow"]["RSRP"]), 
-                        React.createElement("td", {className: "center", style: {width: 105}}, 
-                          React.createElement("i", {className: "fa fa-floppy-o"}), "  ",  this.state["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
-                          React.createElement("i", {className: "fa fa-battery-full"}), "  ",  this.state["LatestDisplayRow"]["BatteryLevel"]
-                        )
-                      )
-                    )
-                  )
-                )
-              )
-              /* /.panel-body */
-            )
-            /* /.panel */
-          )
-          /* /.col-lg-12 */
-        )
-      )
-      )
-    )
-  }
+        );
+
+        }
 });
 
 
@@ -22831,6 +22759,14 @@ function pollState(updateState) {
   pollLoop();
 }
 
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
 module.exports = Display;
 },{"../../mixins/StoreWatchMixin":207,"../../stores/app-store.js":208,"../panels/configure.react":200,"../panels/hint.react":201,"../panels/measurements.react":202,"../panels/summary.react":203,"./displayRow.react":198,"react":188,"react-router-component":8}],198:[function(require,module,exports){
 /**
@@ -22844,69 +22780,87 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 
     render: function() {
 
-        return (
-            React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
-                React.createElement("thead", null, 
-                    React.createElement("tr", {className: "info"}, 
-                        React.createElement("th", null, " ", React.createElement("input", {type: "checkbox"}), " All"), 
-                        React.createElement("th", null, "Name - UUID"), 
-                        React.createElement("th", null, "Upstream"), 
-                        React.createElement("th", null, "Downsteam"), 
-                        React.createElement("th", null, "RSRP "), 
-                        React.createElement("th", null, 
-                      "Battery - ", React.createElement("i", {className: "fa fa-floppy-o"})
-                        )
-                    )
-                ), 
-                React.createElement("tbody", null, 
-                    React.createElement("tr", {className: "even gradeA"}, 
-                        React.createElement("td", null, 
-                            React.createElement("div", null, 
-                                                                      
-                                    React.createElement("a", {href: "#/standard", className: "dropdown-toggle js-activated"}, 
-                                        React.createElement("b", {className: "fa fa-cogs"})
-                                    )
-                            ), 
-                            
-                            React.createElement("div", null, 
-                              
-                                        React.createElement("input", {type: "checkbox"})
-                            ), 
-                            React.createElement("div", null, 
-                    
-                                        React.createElement("img", {src: this.props.item, width: "10px", height: "10px", alt: "logo"})
-                         
-                            )
+        var rows = [];
 
+        this.props.data.forEach(function(uuid, i) {
+        if(uuid["Connection"]["Status"] !== undefined){   
+
+        rows.push(       
+    
+              React.createElement("tr", {className: "even gradeC", key: i}, 
+                        React.createElement("td", {style: {width: 15}}, 
+                          React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
+                          React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
+                          React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
                         ), 
                         React.createElement("td", null, 
-                                React.createElement("ul", null, 
-                                    React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", this.props.item), 
-                                    React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", this.props.item), 
-                                    React.createElement("li", null, React.createElement("b", null, "Name:"), " ", this.props.item)
-                                )
+                          React.createElement("ul", {className: "SmallPadding"}, 
+                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", uuid["LatestDisplayRow"]["Uuid"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", uuid["LatestDisplayRow"]["Mode"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", uuid["LatestDisplayRow"]["UnitName"]), 
+                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", uuid["LatestDisplayRow"]["ReportingInterval"]), 
+                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", uuid["LatestDisplayRow"]["HeartbeatSeconds"])
+                          )
                         ), 
                         React.createElement("td", null, 
-                               React.createElement("ul", null, 
-                                    React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.props.item), 
-                                    React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.props.item), 
-                                    React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", this.props.item)
-                                )
+                          React.createElement("ul", {className: "SmallPadding"}, 
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["LatestDisplayRow"]["UTotalMsgs"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["LatestDisplayRow"]["UTotalBytes"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["LatestDisplayRow"]["UlastMsgReceived"])
+                          )
                         ), 
                         React.createElement("td", {className: "center"}, 
-                                React.createElement("ul", null, 
-                                    React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", this.props.item), 
-                                    React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", this.props.item), 
-                                    React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), this.props.item)
-                                )
+                          React.createElement("ul", {className: "SmallPadding"}, 
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["LatestDisplayRow"]["DTotalMsgs"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["LatestDisplayRow"]["DTotalBytes"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["LatestDisplayRow"]["DlastMsgReceived"])
+                          )
                         ), 
-                        React.createElement("td", {className: "center"}, this.props.item), 
-                        React.createElement("td", {className: "center"}, this.props.item ? "" : "N/A", " -",  
-                                               this.props.item ? "" : "N/A")
-                    )
-                )
-            )
-        );
+                        React.createElement("td", {className: "center"}, uuid["LatestDisplayRow"]["RSRP"]), 
+                        React.createElement("td", {className: "center", style: {width: 105}}, 
+                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
+                          React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["LatestDisplayRow"]["BatteryLevel"]
+                        )
+                      )
+
+                      );
+
+                }
+         
+   
+       });
+                return (
+                        React.createElement("div", {className: "row"}, 
+                          React.createElement("div", {className: "panel panel-default"}, 
+                            React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
+                              React.createElement("div", {className: "panel-body"}, 
+                                React.createElement("div", {className: "dataTable_wrapper"}, 
+                                  React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
+                                    React.createElement("thead", null, 
+                                      React.createElement("tr", {className: "info"}, 
+                                        React.createElement("th", null, " ", React.createElement("input", {type: "checkbox", style: {width: 15}}), " All"), 
+                                        React.createElement("th", null, "Name/Uuid"), 
+                                        React.createElement("th", null, "Uplink"), 
+                                        React.createElement("th", null, "Downlink"), 
+                                        React.createElement("th", null, "RSRP "), 
+                                        React.createElement("th", null, 
+                                          "Others"
+                                        )
+                                      )
+                                    ), 
+                                     React.createElement("tbody", {style: {fontSize: 12}}, 
+                                            rows
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                );
+
+
+
     }
 });
 
@@ -23224,6 +23178,7 @@ var Link = require('react-router-component').Link;
 var Configure = React.createClass({displayName: "Configure",
   render:function(){
     return (
+   
     	React.createElement("div", {className: "col-lg-4"}, 
             React.createElement("div", {style: {height: 60, width: 200, marginTop: 100}}, 
               React.createElement("div", {className: "panel-body"}, 
@@ -23365,21 +23320,49 @@ module.exports = Measurements;
 var React = require('react');
 
 var Summary = React.createClass({displayName: "Summary",
-  render:function(){
-    return (
-     	React.createElement("div", {className: "col-lg-4"}, 
-            React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350}}, 
-              React.createElement("div", {className: "panel-body"}, 
-                React.createElement("p", {style: {fontStyle: 'italic'}}, 
-                  React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  "/*this.state["LatestDisplayRow"]["TotalMsgs"]*/), React.createElement("br", null), 
-                  React.createElement("b", null, "Total Bytes:"), " ", /*this.state["LatestDataVolume"]["UplinkBytes"]*/React.createElement("br", null), 
-                  React.createElement("b", null, "Last Msg:"), "    ", /*this.state["LatestDisplayRow"]["UlastMsgReceived"]*/React.createElement("br", null)
-                )
-              )
-            )
-          )
-    );
-  }
+      render:function(){
+              var rows = [];
+
+              this.props.data.forEach(function(uuid, i) {
+
+
+                          if(uuid["Connection"]["Status"] !== undefined){ 
+
+                                      rows.push(  
+                                    React.createElement("div", null, React.createElement("br", null), 
+                                    React.createElement("div", {className: "col-lg-4"}
+                                    ), 
+                                    React.createElement("div", {className: "col-lg-4", key: i}, 
+                                      React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350, marginTop: 20}}, 
+                                        React.createElement("div", {className: "panel-body"}, 
+                                          React.createElement("p", {style: {fontStyle: 'italic'}}, 
+
+                                           React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", uuid["LatestDisplayRow"]["TotalMsgs"] ), React.createElement("br", null), 
+                                            React.createElement("b", null, "Total Bytes:"), " ", uuid["LatestDisplayRow"]["TotalBytes"], React.createElement("br", null), 
+                                            React.createElement("b", null, "Last Msg:"), "    ", uuid["LatestDisplayRow"]["LastMsgReceived"], React.createElement("br", null)
+                                          )
+                                        )
+                                      )
+                                      )
+                                      )  
+
+                                   );   
+
+                     
+               
+                  }
+
+
+           
+               });
+
+          return (
+
+              React.createElement("div", null, 
+                rows[1]
+             )
+          );
+      }
 });
 
 module.exports = Summary;

@@ -59,6 +59,10 @@
 #define MAX_MEASUREMENT_CONTROL_MEASUREMENT_INTERVAL 0xFFFF // 16 bits
 #define MAX_MEASUREMENT_CONTROL_REPORTING_INTERVAL 0xFFFF // 16 bits
 
+// Flags that can indicate empty values
+#define TX_POWER_DBM_NOT_PRESENT_VALUE 0xFFFFFFFF
+#define MCS_NOT_PRESENT_VALUE 0xFF
+
 // ----------------------------------------------------------------
 // TYPES
 // ----------------------------------------------------------------
@@ -560,6 +564,7 @@ typedef struct TrafficTestModeParametersSetReqDlMsgTag_t
     uint32_t numDlDatagrams; //!< The number of datagrams to expect from the network.
     uint32_t lenDlDatagram; //!< The size of each downlink datagram.
     uint32_t timeoutSeconds; //!< A guard timer for the test.  Zero means no timeout.
+    bool noReportsDuringTest; //!< If true, no TrafficTestModeReportInds as sent during the test.
 } TrafficTestModeParametersSetReqDlMsg_t;
 
 /// TrafficTestModeParametersSetCnfUlMsg_t. Confirmation of the traffic test settings. Sent
@@ -571,6 +576,7 @@ typedef struct TrafficTestModeParametersSetCnfUlMsgTag_t
     uint32_t numDlDatagrams; //!< The number of datagrams to expect from the network.
     uint32_t lenDlDatagram; //!< The size of each downnlink datagram.
     uint32_t timeoutSeconds; //!< The guard timer for the test.  Zero means no timeout.
+    bool noReportsDuringTest; //!< If true, no TrafficTestModeReportInds as sent during the test.
 } TrafficTestModeParametersSetCnfUlMsg_t;
 
 /// TrafficTestModeParametersGetReqDlMsg_t. Sent to get the traffic test settings
@@ -586,6 +592,7 @@ typedef struct TrafficTestModeParametersGetCnfUlMsgTag_t
     uint32_t numDlDatagrams; //!< The number of datagrams to expect from the network.
     uint32_t lenDlDatagram; //!< The size of each downnlink datagram.
     uint32_t timeoutSeconds; //!< The guard timer for the test.  Zero means no timeout.
+    bool noReportsDuringTest; //!< If true, no TrafficTestModeReportInds as sent during the test.
 } TrafficTestModeParametersGetCnfUlMsg_t;
 
 /// The spec for the Traffic Test mode rule breaker datagram
@@ -635,6 +642,12 @@ typedef struct ActivityReportIndUlMsgTag_t
     uint32_t totalTransmitMilliseconds;
     uint32_t totalReceiveMilliseconds;
     uint32_t upTimeSeconds;
+    bool txPowerDbmPresent;
+    uint32_t txPowerDbm;  // Even though this is an uint32_t, only 16 bits are encoded
+    bool ulMcsPresent;
+    uint8_t ulMcs;
+    bool dlMcsPresent;
+    uint8_t dlMcs;
 } ActivityReportIndUlMsg_t;
 
 /// ActivityReportGetReqDlMsg_t.  Request an activity report.
@@ -648,6 +661,12 @@ typedef struct ActivityReportGetCnfUlMsgTag_t
     uint32_t totalTransmitMilliseconds;
     uint32_t totalReceiveMilliseconds;
     uint32_t upTimeSeconds;
+    bool txPowerDbmPresent;
+    uint32_t txPowerDbm;  // Even though this is an uint32_t, only 16 bits are encoded
+    bool ulMcsPresent;
+    uint8_t ulMcs;
+    bool dlMcsPresent;
+    uint8_t dlMcs;
 } ActivityReportGetCnfUlMsg_t;
 
 // ----------------------------------------------------------------

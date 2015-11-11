@@ -49,6 +49,8 @@ type Queue struct {
 }
 
 var TotalMsgs uint64
+var TotalBytes uint64
+
 var Row = &DisplayRow{}
 var RowsList = make([]*DisplayRow, 1)
 

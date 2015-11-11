@@ -138,7 +138,10 @@ func processAmqp(username, amqpAddress string) {
 						UplinkBytes:     uint64(len(value.Data)),
 					}
 					Row.UlastMsgReceived = &now
-					Row.UTotalBytes = uint64(len(value.Data))
+					//Row.UTotalBytes = uint64(len(value.Data))
+					//Row.TotalBytes = uint64(len(value.Data))
+					// Row.TotalBytes = Row.UTotalBytes + Row.DTotalBytes
+					// Row.TotalMsgs = Row.UTotalMsgs + Row.DtotalMsgs
 					connected = "CONNECTED"
 				}
 

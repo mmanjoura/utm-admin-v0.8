@@ -19,6 +19,7 @@ type LatestState struct {
 	LatestPollIndUlMsg                 *PollIndUlMsg                 `json:"LastestPollIndUlMsg,omitempty"`
 	LatestTrafficReportIndUlMsg        *TrafficReportIndUlMsg        `json:"LatestTrafficReportIndUlMsg,omitempty"`
 	LatestDisplayRow                   *DisplayRow                   `json:"LatestDisplayRow,omitempty"`
+	LatestMeasurementsIndUlMsg         *MeasurementsIndUlMsg         `json:"LatestMeasurementsIndUlMsg,omitempty"`
 }
 
 // To update a latest value send a copy of one of the following structs into this channel: *GpsPosition,
@@ -70,6 +71,9 @@ func operateStateTable() {
 
 			case *ReportingIntervalSetCnfUlMsg:
 				state.LatestReportingIntervalSetCnfUlMsg = value.DeepCopy()
+
+			case *MeasurementsIndUlMsg:
+				state.LatestMeasurementsIndUlMsg = value.DeepCopy()
 
 			case *PollIndUlMsg:
 				state.LatestPollIndUlMsg = value.DeepCopy()

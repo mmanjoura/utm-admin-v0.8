@@ -182,6 +182,8 @@ func decode(data []byte) {
 	// Holder for the extracted message
 	var inputBuffer C.union_UlMsgUnionTag_t
 	inputPointer := (*C.UlMsgUnion_t)(unsafe.Pointer(&inputBuffer))
+	Row.TotalMsgs = Row.TotalMsgs + uint64(len(data))
+	Row.UTotalMsgs = Row.UTotalMsgs + uint64(len(data))
 
 	// Loop over the messages in the datagram
 	startPointer := (*C.char)(unsafe.Pointer(&data[0]))
@@ -196,6 +198,8 @@ func decode(data []byte) {
 	for {
 		decoderCount = decoderCount + 1
 		TotalMsgs = TotalMsgs + 1
+		now := time.Now()
+		Row.LastMsgReceived = &now
 
 		fmt.Printf("\n\n===>DECODING MESSAGE NO (%v)  OF AMQP DATAGRAM NO (%v) \n", decoderCount, amqpCount)
 
@@ -264,7 +268,7 @@ func decode(data []byte) {
 				DiskSpaceLeft: string(DiskSpaceLeft(value.diskSpaceLeft)),
 			}
 
-			Row.TotalMsgs = TotalMsgs
+			Row.UTotalMsgs = TotalMsgs
 			Row.Mode = ModeLookUp[string(ModeEnum(value.mode))]
 			Row.BatteryLevel = EnergyLeftLookUP[int(EnergyLeftEnum(value.energyLeft))]
 			Row.DiskSpaceLeft = DiskSpaceLookUP[int(DiskSpaceLeft(value.diskSpaceLeft))]
@@ -291,6 +295,7 @@ func decode(data []byte) {
 
 		case C.DECODE_RESULT_TRANSPARENT_UL_DATAGRAM:
 			rawData = "value"
+			//encodeAndEnqueueIntervalGetReq(Row.Uuid)
 		case C.DECODE_RESULT_DATE_TIME_IND_UL_MSG:
 			rawData = "value"
 		case C.DECODE_RESULT_DATE_TIME_SET_CNF_UL_MSG:
@@ -383,7 +388,9 @@ func encodeAndEnqueueReportingInterval(mins uint32) error {
 		}
 		for _, v := range payload {
 			msg.Payload = append(msg.Payload, int(v))
+			Row.TotalBytes = Row.TotalBytes + uint64(len(payload))
 		}
+
 		log.Printf("%s ENCODED A REPORTING INTERVAL UPDATE OF %d MINUTES AS %v USING AMQP MESSAGE %+v\n", logTag, mins, payload, msg)
 
 		downlinkMessages <- msg
@@ -435,7 +442,7 @@ func encodeAndEnqueueIntervalGetReq(ueGuid string) error {
 		}
 
 		//Record in the DisplayRow
-		Row.DtotalMsgs = Row.DtotalMsgs + 1
+		Row.DTotalMsgs = Row.DTotalMsgs + 1
 		Row.DTotalBytes = Row.DTotalBytes + uint64(len(payload))
 		Row.DlastMsgReceived = &now
 

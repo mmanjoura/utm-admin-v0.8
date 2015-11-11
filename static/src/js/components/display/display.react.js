@@ -13,33 +13,19 @@ var DisplayRow = require('./displayRow.react')
 
 var Link = require('react-router-component').Link
 
+var arrData = [];
+
+var currentUuidsObject = new Object();
+var UuidsMap = new Map();
+var totalMsg = 0;
+var totalBytes = 0;
 
 var Display = React.createClass({
 
-    getInitialState: function(){   
+   getInitialState: function(){   
 
-      var data = {
-
-        "Connection": {},
-        "LatestGpsPosition": {},
-        "LatestLclPosition": {},
-        "LatestLclPositionDisplay": {},
-        "LatestRssi": {},
-        "LatestRssiDisplay": {},
-        "LatestPowerState": {},
-        "LatestPowerStateDisplay": {},
-        "LatestDataVolume": {},
-        "LatestDisplayRow": {}
-    
-    
-    };
-
-    if (window.location.hash == "#debug") {
-      data.json = JSON.stringify(data, null, "  ");
-    } else {
-      data.json = "";
-    }
-    return data;
+      var data = {data:[
+        ]}    
 
       return data;
   },
@@ -68,104 +54,46 @@ var Display = React.createClass({
       } else {
         data.json = "";
       }
-      this.setState(data);
+
+      var currentUuIdkey = data["LatestDisplayRow"]["Uuid"];
+
+      currentUuidsObject[data["LatestDisplayRow"]["Uuid"]] = data;
+      UuidsMap.set(data["LatestDisplayRow"]["Uuid"], data);
+
+
+
+      if (!(currentUuIdkey in currentUuidsObject)){
+        
+        if(currentUuIdkey !== undefined){
+              if(currentUuIdkey.length > 0){
+               // data["LatestDisplayRow"]["TotalMsg"] = data["LatestDisplayRow"]["TotalMsg"] + data["LatestDisplayRow"]["UTotalMsg"] + data["LatestDisplayRow"]["DTotalMsg"] 
+                console.log(data["LatestDisplayRow"]["TotalMsg"]);
+                currentUuidsObject[currentUuIdkey] = data;
+                UuidsMap.set(currentUuIdkey, data);
+              }
+        }
+    
+        
+      }
+
+     // arrData.push(data);
+      this.setState({data: UuidsMap})
+
     }.bind(this), 10000);
+
   },
 
   render:function(){
-
     return (
-      <div className="row">
-      <div>
-        <div className="row"><br />
-         <Configure />
-          {/* /.col-lg-4 */} 
-          <Hint />
-          <div className="col-lg-4">
-            {/* TrxSummary */}
-            <div className="panel panel-info" style={{height: 110, width: 400}}>
-              <div className="panel-body">
-                <p style={{fontStyle: 'italic'}}>
-                  <b>Total Msg:</b> <span className="resetColor">  {this.state["LatestDisplayRow"]["TotalMsgs"]}</span><br />
-                  <b>Total Bytes:</b><span className="resetColor">  {this.state["LatestDataVolume"]["UplinkBytes"]}</span><br />
-                  <b>Last Msg:</b> <span className="resetColor">    {this.state["LatestDisplayRow"]["UlastMsgReceived"]}</span><br />
-                </p> 
-              </div>
+            <div><br />
+              <Configure />
+              <Summary data = { this.state.data} />
+              <Hint />
+              <DisplayRow data = { this.state.data} />
             </div>
-          </div>
-        
-  
-        </div>
-        {/* /.row */}
-        <div className="row" >
-          <div className="panel panel-default" >
-            <div className="_panel-heading" style={{width:'100%'}}>
-              {/* /.panel-heading */}
-              <div className="panel-body">
-                <div className="dataTable_wrapper">
-                  <table className="table table-striped table-bordered table-hover" id="dataTables-example">
-                    <thead>
-                      <tr className="info">
-                        <th> <input type="checkbox" style={{width: 15}} /> All</th>
-                        <th>Name/Uuid</th>
-                       <th>Uplink</th>
-                        <th>Downlink</th>
-                        <th>RSRP </th>
-                        <th>
-                          Others
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody style={{fontSize: 12}}>
-                      <tr className="even gradeA">
-                        <td style={{width: 15}}>
-                          <a tabIndex={-1} href="#/standardtwo"> <b className="fa fa-cogs" /></a><br />
-                          <input type="checkbox" style={{width: 15}} /><br />
-                          <img src="static/dist/assets/images/green.png" alt="logo" style={{maxWidth: 12}} />
-                        </td>
-                        <td>
-                          <ul className="SmallPadding">
-                            <li ><b>Uuid:</b>{this.state["LatestDisplayRow"]["Uuid"]}</li>
-                            <li><b>Mode:</b> {this.state["LatestDisplayRow"]["Mode"]}</li>
-                            <li><b>Name:</b> {this.state["LatestDisplayRow"]["UnitName"]}</li>
-                             <li><b>Reporting Interval:</b> {this.state["LatestDisplayRow"]["ReportingInterval"]}</li>
-                              <li><b>Heart Beat:</b> {this.state["LatestDisplayRow"]["HeartbeatSeconds"]}</li>
-                          </ul>   
-                        </td>
-                        <td>
-                          <ul className="SmallPadding">
-                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["TotalMsgs"]}</li>
-                            <li><b>Total Bytes:</b> {this.state["LatestDataVolume"]["UplinkBytes"]}</li>
-                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["UlastMsgReceived"]}</li>
-                          </ul> 
-                        </td>
-                        <td className="center">
-                          <ul className="SmallPadding">
-                            <li><b>Total Msg:</b> {this.state["LatestDisplayRow"]["DtotalMsgs"]}</li>
-                            <li><b>Total Bytes:</b> {this.state["LatestDisplayRow"]["DTotalBytes"]}</li>
-                            <li><b>Last Msg RX:</b> {this.state["LatestDisplayRow"]["DlastMsgReceived"]}</li>
-                          </ul>
-                        </td>
-                        <td className="center">{this.state["LatestDisplayRow"]["RSRP"]}</td>
-                        <td className="center" style={{width: 105}}>
-                          <i className="fa fa-floppy-o" />&nbsp; { this.state["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
-                          <i className="fa fa-battery-full" />&nbsp; { this.state["LatestDisplayRow"]["BatteryLevel"]}
-                        </td> 
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              {/* /.panel-body */}
-            </div>
-            {/* /.panel */}
-          </div>
-          {/* /.col-lg-12 */}
-        </div>
-      </div>
-      </div>
-    )
-  }
+        );
+
+        }
 });
 
 
@@ -196,6 +124,14 @@ function pollState(updateState) {
   }
   pollLoop();
 }
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
 module.exports = Display;
 

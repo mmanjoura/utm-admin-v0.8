@@ -37,7 +37,10 @@ extern "C" {
 
 /// The revision level of this API.
 // 0: No revision yet, under development and still changing constantly.
-#define REVISION_LEVEL 0
+// 1: First release version.
+// 2: Added "noReportsDuringTest" to the TrafficTestModeParametersSetReq/SetCnf/GetCnf messages.
+//    Added "txPowerDbm", "ulMcs" and "dlMcs" (plus present flags) to ActivityIndUlMsg and ActivityGetCnfUlMsg.
+#define REVISION_LEVEL 2
 
 /// How often a report is sent to the network (in heartbeats).
 #define DEFAULT_REPORTING_INTERVAL 1
@@ -1197,8 +1200,9 @@ uint32_t logTrafficReportDl(char * pBuffer, uint32_t *pBufferSize, uint32_t data
 // will be modified on exit to reflect the bytes used.
 // \param count the number of datagrams to send.
 // \param length the length of the datagrams.
+// \param noReportsDuringTest whether reports are sent during the test or not.
 // \return the number of bytes used to code the message.
-uint32_t logTrafficTestModeParametersUl (char * pBuffer, uint32_t *pBufferSize, uint32_t count, uint32_t length);
+uint32_t logTrafficTestModeParametersUl(char * pBuffer, uint32_t *pBufferSize, uint32_t count, uint32_t length, bool noReportsDuringTest);
 
 /// Log the traffic test mode parameters for the UTM to receive.
 // \param pBuffer  a pointer to the logging buffer.
@@ -1248,6 +1252,26 @@ uint32_t logTrafficTestModeRuleBreakerDatagram (char * pBuffer, uint32_t *pBuffe
 // \param upTimeSeconds the time that the UTM has been up for.
 // \return the number of bytes used to code the message.
 uint32_t logActivityReport(char * pBuffer, uint32_t *pBufferSize, uint32_t totalTransmitMilliseconds, uint32_t totalReceiveMilliseconds, uint32_t upTimeSeconds);
+
+/// Log the Activity report receive values from the UTM.
+// \param pBuffer  a pointer to the logging buffer.
+// \param pBufferSize a pointer to the size of the logging buffer.  This
+// will be modified on exit to reflect the bytes used.
+// \param txPowerDbmPresent if true then the Tx power is present.
+// \param txPowerDbm  the Tx power in dBm.
+// \param mcsPresent if true then the uplink MCS is present.
+// \param mcs the uplink MCS.
+// \return the number of bytes used to code the message.
+uint32_t logUlRf(char * pBuffer, uint32_t *pBufferSize, bool txPowerDbmPresent, uint16_t txPowerDbm, bool mcsPresent, uint8_t mcs);
+
+/// Log the Activity report receive values from the UTM.
+// \param pBuffer  a pointer to the logging buffer.
+// \param pBufferSize a pointer to the size of the logging buffer.  This
+// will be modified on exit to reflect the bytes used.
+// \param mcsPresent if true then the downlink MCS is present.
+// \param mcs the downlink MCS.
+// \return the number of bytes used to code the message.
+uint32_t logDlRf(char * pBuffer, uint32_t *pBufferSize, bool mcsPresent, uint8_t mcs);
 
 /// Log a string from a DebugInd message
 // \param pBuffer  a pointer to the logging buffer.

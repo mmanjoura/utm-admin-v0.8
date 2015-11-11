@@ -6,13 +6,15 @@ import (
 
 type DisplayRow struct {
 	TotalMsgs          uint64     `json:"TotalMsgs,omitempty"`
+	TotalBytes         uint64     `json:"TotalBytes,omitempty"`
+	LastMsgReceived    *time.Time `json:"LastMsgReceived,omitempty"`
 	Uuid               string     `json:"Uuid,omitempty"`
 	UnitName           string     `json:"UnitName, omitempty"`
 	Mode               string     `json:"Mode, omitempty"`
 	UTotalMsgs         uint64     `json:"UTotalMsgs, omitempty"`
 	UTotalBytes        uint64     `json:"UTotalBytes, omitempty"`
 	UlastMsgReceived   *time.Time `json:"UlastMsgReceived, omitempty"`
-	DtotalMsgs         uint64     `json:"DtotalMsgs, omitempty"`
+	DTotalMsgs         uint64     `json:"DTotalMsgs, omitempty"`
 	DTotalBytes        uint64     `json:"DTotalBytes, omitempty"`
 	DlastMsgReceived   *time.Time `json:"DlastMsgReceived, omitempty"`
 	RSRP               int32      `json:"RSRP, omitempty"`
@@ -92,7 +94,7 @@ type DataVolume struct {
 	DownlinkBytes     uint64
 }
 
-type Measurements struct {
+type MeasurementsIndUlMsg struct {
 	time                int32 //!< Time in UTC seconds.
 	gnssPositionPresent bool
 	//gnssPosition        GnssPosition
@@ -244,13 +246,15 @@ func (value *DisplayRow) DeepCopy() *DisplayRow {
 	}
 	result := &DisplayRow{
 		TotalMsgs:          value.TotalMsgs,
+		TotalBytes:         value.TotalBytes,
+		LastMsgReceived:    value.LastMsgReceived,
 		Uuid:               value.Uuid,
 		UnitName:           value.UnitName,
 		Mode:               value.Mode,
 		UTotalMsgs:         value.UTotalMsgs,
 		UTotalBytes:        value.UTotalBytes,
 		UlastMsgReceived:   value.UlastMsgReceived,
-		DtotalMsgs:         value.DtotalMsgs,
+		DTotalMsgs:         value.DTotalMsgs,
 		DTotalBytes:        value.DTotalBytes,
 		DlastMsgReceived:   value.DlastMsgReceived,
 		RSRP:               value.RSRP,
@@ -259,6 +263,17 @@ func (value *DisplayRow) DeepCopy() *DisplayRow {
 		ReportingInterval:  value.ReportingInterval,
 		HeartbeatSeconds:   value.HeartbeatSeconds,
 		HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
+	}
+	return result
+}
+
+func (value *MeasurementsIndUlMsg) DeepCopy() *MeasurementsIndUlMsg {
+	if value == nil {
+		return nil
+	}
+	result := &MeasurementsIndUlMsg{
+	// rsrp: value.Timestamp,
+	// rssi: value.ReportingIntervalMinutes,
 	}
 	return result
 }

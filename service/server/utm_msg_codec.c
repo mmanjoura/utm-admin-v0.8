@@ -586,7 +586,7 @@ uint32_t encodeMeasurements(char * pBuffer, Measurements_t * pMeasurements, char
         pBuffer += encodeUint32(pBuffer, (uint32_t) pMeasurements->gnssPosition.longitude);
         pBuffer += encodeUint32(pBuffer, (uint32_t) pMeasurements->gnssPosition.elevation);
     }
-    if (pMeasurements->cellId)
+    if (pMeasurements->cellIdPresent)
     {
         pBuffer += encodeUint16(pBuffer, pMeasurements->cellId);
     }
@@ -765,7 +765,7 @@ bool decodeMeasurements(const char ** ppBuffer, Measurements_t * pMeasurements, 
         if (bitMapBytes[0] & 0x20)
         {
             pMeasurements->powerStatePresent = true;
-            x = (uint8_t) * *ppBuffer;
+            x = (uint8_t) **ppBuffer;
             (*ppBuffer)++;
 
             pMeasurements->powerState.batteryMV = (uint32_t)((uint32_t) x & 0x3F) * 10000 / 0x3F;
@@ -863,8 +863,8 @@ uint32_t logMeasurements(char * pBuffer, uint32_t * pBufferSize, Measurements_t 
 // onlyRecordIfAboveNotBelow     bit 5     bool
 // onlyRecordIfAtTransitionOnly  bit 6     bool
 // onlyRecordIfIsOneShot         bit 7     bool
-// measurementInterval           4 bytes   uint32_t
-// maxReportingInterval          4 bytes   uint32_t, only present if maxReportingIntervalPresent is 1
+// measurementInterval           2 bytes   uint16_t
+// maxReportingInterval          2 bytes   uint16_t, only present if maxReportingIntervalPresent is 1
 // hysteresisValue               4 bytes   uint32_t, only present if useHysteresis is 1.
 // onlyRecordIfValue             4 bytes   uint32_t, only present if onlyRecordIfPresent is 1.
 uint32_t encodeMeasurementControlGeneric(char * pBuffer, MeasurementControlGeneric_t * pMeasurementControlGeneric, char ** ppLog, uint32_t * pLogSize)
@@ -1638,14 +1638,14 @@ uint32_t logHeartbeat(char * pBuffer, uint32_t *pBufferSize, uint32_t heartbeatV
 /// Log the RSSI
 uint32_t logRssi(char * pBuffer, uint32_t *pBufferSize, Rssi_t rssi)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%.1f\" RssiUnits=\"dBm\" />", (double) rssi / 10);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%.1f\" Units=\"dBm\" />", (double) rssi / 10);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
 /// Log the RSRP
 uint32_t logRsrp(char * pBuffer, uint32_t *pBufferSize, Rssi_t rsrp, bool isSyncedWithRssi)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%.1f\" RsrpUnits=\"dBm\" IsSyncedWithRssi=\"%s\" />", (double) rsrp / 10, getStringBoolean(isSyncedWithRssi));
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%.1f\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", (double) rsrp / 10, getStringBoolean(isSyncedWithRssi));
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -1712,9 +1712,9 @@ uint32_t logTrafficReportDl(char * pBuffer, uint32_t *pBufferSize, uint32_t data
 }
 
 /// Log the Traffic Test mode parameters for transmit from the UTM.
-uint32_t logTrafficTestModeParametersUl(char * pBuffer, uint32_t *pBufferSize, uint32_t count, uint32_t length)
+uint32_t logTrafficTestModeParametersUl(char * pBuffer, uint32_t *pBufferSize, uint32_t count, uint32_t length, bool noReportsDuringTest)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<DatagramsUplink Count=\"%ld\" Length=\"%ld\" />", count, length);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<DatagramsUplink Count=\"%ld\" Length=\"%ld\" NoReportsDuringTest=\"%s\" />", count, length, getStringBoolean(noReportsDuringTest));
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -1750,7 +1750,23 @@ uint32_t logTrafficTestModeRuleBreakerDatagram(char * pBuffer, uint32_t *pBuffer
 /// Log the Activity report values from the UTM
 uint32_t logActivityReport(char * pBuffer, uint32_t *pBufferSize, uint32_t totalTransmitMilliseconds, uint32_t totalReceiveMilliseconds, uint32_t upTimeSeconds)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Activity Transmit=\"%ld\" Receive=\"%ld\" Units=\"Milliseconds\" /><UpTime Value=\"%ld\" Units=\"Seconds\" />", totalTransmitMilliseconds, totalReceiveMilliseconds, upTimeSeconds);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Activity Transmit=\"%ld\" Receive=\"%ld\" Units=\"Milliseconds\" /><UpTime Value=\"%ld\" Units=\"Seconds\" />", totalTransmitMilliseconds,
+            totalReceiveMilliseconds, upTimeSeconds);
+    return calcBytesUsed(pBufferSize, bytesUsed);
+}
+
+/// Log some UL RF parameters from the UTM
+uint32_t logUlRf(char * pBuffer, uint32_t *pBufferSize, bool txPowerDbmPresent, uint16_t txPowerDbm, bool mcsPresent, uint8_t mcs)
+{
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<UlRf TxPowerPresent=\"%s\" TxPower=\"%d\" Units=\"dBm\" McsPresent=\"%s\", Mcs=\"%d\" />",
+            getStringBoolean(txPowerDbmPresent), txPowerDbm, getStringBoolean(mcsPresent), mcs);
+    return calcBytesUsed(pBufferSize, bytesUsed);
+}
+
+/// Log some DL RF parameters from the UTM
+uint32_t logDlRf(char * pBuffer, uint32_t *pBufferSize, bool mcsPresent, uint8_t mcs)
+{
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<DlRf McsPresent=\"%s\", Mcs=\"%d\" />", getStringBoolean(mcsPresent), mcs);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -2503,7 +2519,7 @@ uint32_t encodeMeasurementControlSetReqDlMsg(char * pBuffer, MeasurementControlS
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
     }
 
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), pMsg->measurementType, (MeasurementControlUnion_t *) &(pMsg->measurementControl), &*ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), pMsg->measurementType, (MeasurementControlUnion_t *) &(pMsg->measurementControl), ppLog, pLogSize);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2536,7 +2552,7 @@ uint32_t encodeMeasurementControlSetCnfUlMsg(char * pBuffer, MeasurementControlS
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
     }
 
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), pMsg->measurementType, (MeasurementControlUnion_t *) &(pMsg->measurementControl), &*ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), pMsg->measurementType, (MeasurementControlUnion_t *) &(pMsg->measurementControl), ppLog, pLogSize);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2591,12 +2607,12 @@ uint32_t encodeMeasurementsControlGetCnfUlMsg(char * pBuffer, MeasurementsContro
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
     }
 
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pMsg->gnss), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pMsg->cellId), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pMsg->rsrp), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pMsg->rssi), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pMsg->temperature), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pMsg->powerState), &*ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pMsg->gnss), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pMsg->cellId), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pMsg->rsrp), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pMsg->rssi), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pMsg->temperature), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pMsg->powerState), ppLog, pLogSize);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2627,12 +2643,12 @@ uint32_t encodeMeasurementsControlIndUlMsg(char * pBuffer, MeasurementsControlIn
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
     }
 
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pMsg->gnss), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pMsg->cellId), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pMsg->rsrp), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pMsg->rssi), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pMsg->temperature), &*ppLog, pLogSize);
-    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pMsg->powerState), &*ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pMsg->gnss), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pMsg->cellId), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pMsg->rsrp), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pMsg->rssi), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pMsg->temperature), ppLog, pLogSize);
+    numBytesEncoded += encodeMeasurementControl(&(pBuffer[numBytesEncoded]), MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pMsg->powerState), ppLog, pLogSize);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2795,6 +2811,7 @@ uint32_t encodeTrafficTestModeParametersSetReqDlMsg(char * pBuffer, TrafficTestM
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->numDlDatagrams);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->lenDlDatagram);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->timeoutSeconds);
+    numBytesEncoded += encodeBool (&(pBuffer[numBytesEncoded]), pMsg->noReportsDuringTest);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2805,7 +2822,7 @@ uint32_t encodeTrafficTestModeParametersSetReqDlMsg(char * pBuffer, TrafficTestM
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersSetReqDlMsg");
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-        *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pMsg->numUlDatagrams, pMsg->lenUlDatagram);
+        *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pMsg->numUlDatagrams, pMsg->lenUlDatagram, pMsg->noReportsDuringTest);
         *ppLog += logTrafficTestModeParametersDl(*ppLog, pLogSize, pMsg->numDlDatagrams, pMsg->lenDlDatagram);
         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pMsg->timeoutSeconds != 0), pMsg->timeoutSeconds);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
@@ -2828,6 +2845,7 @@ uint32_t encodeTrafficTestModeParametersSetCnfUlMsg(char * pBuffer, TrafficTestM
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->numDlDatagrams);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->lenDlDatagram);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->timeoutSeconds);
+    numBytesEncoded += encodeBool (&(pBuffer[numBytesEncoded]), pMsg->noReportsDuringTest);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2838,7 +2856,7 @@ uint32_t encodeTrafficTestModeParametersSetCnfUlMsg(char * pBuffer, TrafficTestM
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersSetCnfUlMsg");
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-        *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pMsg->numUlDatagrams, pMsg->lenUlDatagram);
+        *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pMsg->numUlDatagrams, pMsg->lenUlDatagram, pMsg->noReportsDuringTest);
         *ppLog += logTrafficTestModeParametersDl(*ppLog, pLogSize, pMsg->numDlDatagrams, pMsg->lenDlDatagram);
         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pMsg->timeoutSeconds != 0), pMsg->timeoutSeconds);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
@@ -2885,6 +2903,7 @@ uint32_t encodeTrafficTestModeParametersGetCnfUlMsg(char * pBuffer, TrafficTestM
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->numDlDatagrams);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->lenDlDatagram);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->timeoutSeconds);
+    numBytesEncoded += encodeBool (&(pBuffer[numBytesEncoded]), pMsg->noReportsDuringTest);
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -2895,7 +2914,7 @@ uint32_t encodeTrafficTestModeParametersGetCnfUlMsg(char * pBuffer, TrafficTestM
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersGetCnfUlMsg");
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-        *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pMsg->numUlDatagrams, pMsg->lenUlDatagram);
+        *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pMsg->numUlDatagrams, pMsg->lenUlDatagram, pMsg->noReportsDuringTest);
         *ppLog += logTrafficTestModeParametersDl(*ppLog, pLogSize, pMsg->numDlDatagrams, pMsg->lenDlDatagram);
         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pMsg->timeoutSeconds != 0), pMsg->timeoutSeconds);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
@@ -3063,6 +3082,32 @@ uint32_t encodeActivityReportIndUlMsg(char * pBuffer, ActivityReportIndUlMsg_t *
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalTransmitMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalReceiveMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->upTimeSeconds);
+    if (pMsg->txPowerDbmPresent)
+    {
+        numBytesEncoded += encodeUint16(&(pBuffer[numBytesEncoded]), pMsg->txPowerDbm);
+    }
+    else
+    {
+        numBytesEncoded += encodeUint16(&(pBuffer[numBytesEncoded]), (uint16_t) TX_POWER_DBM_NOT_PRESENT_VALUE);
+    }
+    if (pMsg->ulMcsPresent)
+    {
+        pBuffer[numBytesEncoded] = pMsg->ulMcs;
+    }
+    else
+    {
+        pBuffer[numBytesEncoded] = MCS_NOT_PRESENT_VALUE;
+    }
+    numBytesEncoded++;
+    if (pMsg->dlMcsPresent)
+    {
+        pBuffer[numBytesEncoded] = pMsg->dlMcs;
+    }
+    else
+    {
+        pBuffer[numBytesEncoded] = MCS_NOT_PRESENT_VALUE;
+    }
+    numBytesEncoded++;
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -3074,6 +3119,8 @@ uint32_t encodeActivityReportIndUlMsg(char * pBuffer, ActivityReportIndUlMsg_t *
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "ActivityReportIndUlMsg");
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
         *ppLog += logActivityReport(*ppLog, pLogSize, pMsg->totalTransmitMilliseconds, pMsg->totalReceiveMilliseconds, pMsg->upTimeSeconds);
+        *ppLog += logUlRf(*ppLog, pLogSize, pMsg->txPowerDbmPresent, pMsg->txPowerDbm, pMsg->ulMcsPresent, pMsg->ulMcs);
+        *ppLog += logDlRf(*ppLog, pLogSize, pMsg->dlMcsPresent, pMsg->dlMcs);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, numBytesEncoded);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
@@ -3116,6 +3163,32 @@ uint32_t encodeActivityReportGetCnfUlMsg(char * pBuffer, ActivityReportGetCnfUlM
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalTransmitMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalReceiveMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->upTimeSeconds);
+    if (pMsg->txPowerDbmPresent)
+    {
+        numBytesEncoded += encodeUint16(&(pBuffer[numBytesEncoded]), pMsg->txPowerDbm);
+    }
+    else
+    {
+        numBytesEncoded += encodeUint16(&(pBuffer[numBytesEncoded]), (uint16_t) TX_POWER_DBM_NOT_PRESENT_VALUE);
+    }
+    if (pMsg->ulMcsPresent)
+    {
+        pBuffer[numBytesEncoded] = pMsg->ulMcs;
+    }
+    else
+    {
+        pBuffer[numBytesEncoded] = MCS_NOT_PRESENT_VALUE;
+    }
+    numBytesEncoded++;
+    if (pMsg->dlMcsPresent)
+    {
+        pBuffer[numBytesEncoded] = pMsg->dlMcs;
+    }
+    else
+    {
+        pBuffer[numBytesEncoded] = MCS_NOT_PRESENT_VALUE;
+    }
+    numBytesEncoded++;
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
     numBytesEncoded++;
 
@@ -3127,6 +3200,8 @@ uint32_t encodeActivityReportGetCnfUlMsg(char * pBuffer, ActivityReportGetCnfUlM
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "ActivityReportGetCnfUlMsg");
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
         *ppLog += logActivityReport(*ppLog, pLogSize, pMsg->totalTransmitMilliseconds, pMsg->totalReceiveMilliseconds, pMsg->upTimeSeconds);
+        *ppLog += logUlRf(*ppLog, pLogSize, pMsg->txPowerDbmPresent, pMsg->txPowerDbm, pMsg->ulMcsPresent, pMsg->ulMcs);
+        *ppLog += logDlRf(*ppLog, pLogSize, pMsg->dlMcsPresent, pMsg->dlMcs);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, numBytesEncoded);
         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
@@ -3498,7 +3573,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         pOutBuffer->measurementControlSetReqDlMsg.measurementType = (MeasurementType_t) **ppInBuffer;
                         (*ppInBuffer)++;
                         if (!decodeMeasurementControl(ppInBuffer, pOutBuffer->measurementControlSetReqDlMsg.measurementType,
-                                (MeasurementControlUnion_t *) &(pOutBuffer->measurementControlSetReqDlMsg.measurementControl), &*ppLog, pLogSize))
+                                (MeasurementControlUnion_t *) &(pOutBuffer->measurementControlSetReqDlMsg.measurementControl), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
@@ -3584,6 +3659,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         pOutBuffer->trafficTestModeParametersSetReqDlMsg.numDlDatagrams = decodeUint32(ppInBuffer);
                         pOutBuffer->trafficTestModeParametersSetReqDlMsg.lenDlDatagram = decodeUint32(ppInBuffer);
                         pOutBuffer->trafficTestModeParametersSetReqDlMsg.timeoutSeconds = decodeUint32(ppInBuffer);
+                        pOutBuffer->trafficTestModeParametersSetReqDlMsg.noReportsDuringTest = decodeBool(ppInBuffer);
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;
@@ -3596,7 +3672,8 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersSetReqDlMsg");
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pOutBuffer->trafficTestModeParametersSetReqDlMsg.numUlDatagrams,
-                                pOutBuffer->trafficTestModeParametersSetReqDlMsg.lenUlDatagram);
+                                pOutBuffer->trafficTestModeParametersSetReqDlMsg.lenUlDatagram,
+                                pOutBuffer->trafficTestModeParametersSetReqDlMsg.noReportsDuringTest);
                         *ppLog += logTrafficTestModeParametersDl(*ppLog, pLogSize, pOutBuffer->trafficTestModeParametersSetReqDlMsg.numDlDatagrams,
                                 pOutBuffer->trafficTestModeParametersSetReqDlMsg.lenDlDatagram);
                         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pOutBuffer->trafficTestModeParametersSetReqDlMsg.timeoutSeconds != 0),
@@ -3635,7 +3712,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         uint8_t expectedFill = pOutBuffer->trafficTestModeRuleBreakerDatagram.fill;
                         uint8_t expectedLength = pOutBuffer->trafficTestModeRuleBreakerDatagram.length;
 
-                        if (!decodeTrafficTestModeRuleBreakerDatagram(ppInBuffer, true, &(pOutBuffer->trafficTestModeRuleBreakerDatagram), &*ppLog, pLogSize))
+                        if (!decodeTrafficTestModeRuleBreakerDatagram(ppInBuffer, true, &(pOutBuffer->trafficTestModeRuleBreakerDatagram), ppLog, pLogSize))
                         {
                             if ((sizeInBuffer == expectedLength) && (pOutBuffer->trafficTestModeRuleBreakerDatagram.fill != expectedFill))
                             {
@@ -4099,7 +4176,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsGetCnfUlMsg");
                             *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         }
-                        if (!decodeMeasurements(ppInBuffer, &(pOutBuffer->measurementsGetCnfUlMsg.measurements), &*ppLog, pLogSize))
+                        if (!decodeMeasurements(ppInBuffer, &(pOutBuffer->measurementsGetCnfUlMsg.measurements), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
@@ -4129,7 +4206,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsIndUlMsg");
                             *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         }
-                        if (!decodeMeasurements(ppInBuffer, &(pOutBuffer->measurementsIndUlMsg.measurements), &*ppLog, pLogSize))
+                        if (!decodeMeasurements(ppInBuffer, &(pOutBuffer->measurementsIndUlMsg.measurements), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
@@ -4162,7 +4239,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         pOutBuffer->measurementControlSetCnfUlMsg.measurementType = (MeasurementType_t) **ppInBuffer;
                         (*ppInBuffer)++;
                         if (!decodeMeasurementControl(ppInBuffer, pOutBuffer->measurementControlSetCnfUlMsg.measurementType,
-                                (MeasurementControlUnion_t *) &(pOutBuffer->measurementControlSetCnfUlMsg.measurementControl), &*ppLog, pLogSize))
+                                (MeasurementControlUnion_t *) &(pOutBuffer->measurementControlSetCnfUlMsg.measurementControl), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
@@ -4192,33 +4269,33 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsControlGetCnfUlMsg");
                             *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         }
-                        if (!decodeMeasurementControl(ppInBuffer, MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.gnss), &*ppLog, pLogSize))
+                        if (!decodeMeasurementControl(ppInBuffer, MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.gnss), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.cellId), &*ppLog, pLogSize))
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.cellId), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rsrp), &*ppLog, pLogSize))
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rsrp), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rssi), &*ppLog, pLogSize))
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rssi), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.temperature), &*ppLog,
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.temperature), ppLog,
                                         pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.powerState), &*ppLog,
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.powerState), ppLog,
                                         pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
@@ -4249,33 +4326,33 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsControlIndUlMsg");
                             *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         }
-                        if (!decodeMeasurementControl(ppInBuffer, MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.gnss), &*ppLog, pLogSize))
+                        if (!decodeMeasurementControl(ppInBuffer, MEASUREMENT_GNSS, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.gnss), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.cellId), &*ppLog, pLogSize))
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_CELL_ID, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.cellId), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rsrp), &*ppLog, pLogSize))
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSRP, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rsrp), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rssi), &*ppLog, pLogSize))
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_RSSI, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.rssi), ppLog, pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.temperature), &*ppLog,
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_TEMPERATURE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.temperature), ppLog,
                                         pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
                         }
                         if ((decodeResult != DECODE_RESULT_BAD_MSG_FORMAT)
-                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.powerState), &*ppLog,
+                                && !decodeMeasurementControl(ppInBuffer, MEASUREMENT_POWER_STATE, (MeasurementControlUnion_t *) &(pOutBuffer->measurementsControlGetCnfUlMsg.powerState), ppLog,
                                         pLogSize))
                         {
                             decodeResult = DECODE_RESULT_BAD_MSG_FORMAT;
@@ -4389,6 +4466,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         pOutBuffer->trafficTestModeParametersSetCnfUlMsg.numDlDatagrams = decodeUint32(ppInBuffer);
                         pOutBuffer->trafficTestModeParametersSetCnfUlMsg.lenDlDatagram = decodeUint32(ppInBuffer);
                         pOutBuffer->trafficTestModeParametersSetCnfUlMsg.timeoutSeconds = decodeUint32(ppInBuffer);
+                        pOutBuffer->trafficTestModeParametersSetCnfUlMsg.noReportsDuringTest = decodeBool(ppInBuffer);
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;
@@ -4401,7 +4479,8 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersSetCnfUlMsg");
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pOutBuffer->trafficTestModeParametersSetCnfUlMsg.numUlDatagrams,
-                                pOutBuffer->trafficTestModeParametersSetCnfUlMsg.lenUlDatagram);
+                                pOutBuffer->trafficTestModeParametersSetCnfUlMsg.lenUlDatagram,
+                                pOutBuffer->trafficTestModeParametersSetCnfUlMsg.noReportsDuringTest);
                         *ppLog += logTrafficTestModeParametersDl(*ppLog, pLogSize, pOutBuffer->trafficTestModeParametersSetCnfUlMsg.numDlDatagrams,
                                 pOutBuffer->trafficTestModeParametersSetCnfUlMsg.lenDlDatagram);
                         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pOutBuffer->trafficTestModeParametersSetCnfUlMsg.timeoutSeconds != 0),
@@ -4423,6 +4502,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         pOutBuffer->trafficTestModeParametersGetCnfUlMsg.numDlDatagrams = decodeUint32(ppInBuffer);
                         pOutBuffer->trafficTestModeParametersGetCnfUlMsg.lenDlDatagram = decodeUint32(ppInBuffer);
                         pOutBuffer->trafficTestModeParametersGetCnfUlMsg.timeoutSeconds = decodeUint32(ppInBuffer);
+                        pOutBuffer->trafficTestModeParametersGetCnfUlMsg.noReportsDuringTest = decodeBool (ppInBuffer);
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;
@@ -4435,7 +4515,8 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersGetCnfUlMsg");
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTrafficTestModeParametersUl(*ppLog, pLogSize, pOutBuffer->trafficTestModeParametersGetCnfUlMsg.numUlDatagrams,
-                                pOutBuffer->trafficTestModeParametersGetCnfUlMsg.lenUlDatagram);
+                                pOutBuffer->trafficTestModeParametersGetCnfUlMsg.lenUlDatagram,
+                                pOutBuffer->trafficTestModeParametersGetCnfUlMsg.noReportsDuringTest);
                         *ppLog += logTrafficTestModeParametersDl(*ppLog, pLogSize, pOutBuffer->trafficTestModeParametersGetCnfUlMsg.numDlDatagrams,
                                 pOutBuffer->trafficTestModeParametersGetCnfUlMsg.lenDlDatagram);
                         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pOutBuffer->trafficTestModeParametersGetCnfUlMsg.timeoutSeconds != 0),
@@ -4455,7 +4536,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         uint8_t expectedFill = pOutBuffer->trafficTestModeRuleBreakerDatagram.fill;
                         uint8_t expectedLength = pOutBuffer->trafficTestModeRuleBreakerDatagram.length;
 
-                        if (!decodeTrafficTestModeRuleBreakerDatagram(ppInBuffer, false, &(pOutBuffer->trafficTestModeRuleBreakerDatagram), &*ppLog, pLogSize))
+                        if (!decodeTrafficTestModeRuleBreakerDatagram(ppInBuffer, false, &(pOutBuffer->trafficTestModeRuleBreakerDatagram), ppLog, pLogSize))
                         {
                             if ((sizeInBuffer == expectedLength) && (pOutBuffer->trafficTestModeRuleBreakerDatagram.fill != expectedFill))
                             {
@@ -4548,9 +4629,29 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     decodeResult = DECODE_RESULT_ACTIVITY_REPORT_IND_UL_MSG;
                     if (pOutBuffer != NULL)
                     {
+                        pOutBuffer->activityReportIndUlMsg.txPowerDbmPresent = false;
+                        pOutBuffer->activityReportIndUlMsg.ulMcsPresent = false;
+                        pOutBuffer->activityReportIndUlMsg.dlMcsPresent = false;
                         pOutBuffer->activityReportIndUlMsg.totalTransmitMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportIndUlMsg.totalReceiveMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportIndUlMsg.upTimeSeconds = decodeUint32(ppInBuffer);
+                        pOutBuffer->activityReportIndUlMsg.txPowerDbm = decodeUint16(ppInBuffer);
+                        if (pOutBuffer->activityReportIndUlMsg.txPowerDbm != TX_POWER_DBM_NOT_PRESENT_VALUE)
+                        {
+                            pOutBuffer->activityReportIndUlMsg.txPowerDbmPresent = true;
+                        }
+                        pOutBuffer->activityReportIndUlMsg.ulMcs = (uint8_t) **ppInBuffer;
+                        (*ppInBuffer)++;
+                        if (pOutBuffer->activityReportIndUlMsg.ulMcs != MCS_NOT_PRESENT_VALUE)
+                        {
+                            pOutBuffer->activityReportIndUlMsg.ulMcsPresent = true;
+                        }
+                        pOutBuffer->activityReportIndUlMsg.dlMcs = (uint8_t) **ppInBuffer;
+                        (*ppInBuffer)++;
+                        if (pOutBuffer->activityReportIndUlMsg.dlMcs != MCS_NOT_PRESENT_VALUE)
+                        {
+                            pOutBuffer->activityReportIndUlMsg.dlMcsPresent = true;
+                        }
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;
@@ -4562,9 +4663,13 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "ActivityReportIndUlMsg");
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logActivityReport(*ppLog, pLogSize, pOutBuffer->activityReportIndUlMsg.totalTransmitMilliseconds,
-                                pOutBuffer->activityReportIndUlMsg.totalReceiveMilliseconds,
+                        *ppLog += logActivityReport(*ppLog, pLogSize, pOutBuffer->activityReportIndUlMsg.totalTransmitMilliseconds, pOutBuffer->activityReportIndUlMsg.totalReceiveMilliseconds,
                                 pOutBuffer->activityReportIndUlMsg.upTimeSeconds);
+                        *ppLog += logUlRf(*ppLog, pLogSize, pOutBuffer->activityReportIndUlMsg.txPowerDbmPresent,
+                                pOutBuffer->activityReportIndUlMsg.txPowerDbm,
+                                pOutBuffer->activityReportIndUlMsg.ulMcsPresent,
+                                pOutBuffer->activityReportIndUlMsg.ulMcs);
+                        *ppLog += logDlRf(*ppLog, pLogSize, pOutBuffer->activityReportIndUlMsg.dlMcsPresent, pOutBuffer->activityReportIndUlMsg.dlMcs);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
@@ -4577,9 +4682,29 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     decodeResult = DECODE_RESULT_ACTIVITY_REPORT_GET_CNF_UL_MSG;
                     if (pOutBuffer != NULL)
                     {
+                        pOutBuffer->activityReportGetCnfUlMsg.txPowerDbmPresent = false;
+                        pOutBuffer->activityReportGetCnfUlMsg.ulMcsPresent = false;
+                        pOutBuffer->activityReportGetCnfUlMsg.dlMcsPresent = false;
                         pOutBuffer->activityReportGetCnfUlMsg.totalTransmitMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportGetCnfUlMsg.totalReceiveMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportGetCnfUlMsg.upTimeSeconds = decodeUint32(ppInBuffer);
+                        pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm = decodeUint16(ppInBuffer);
+                        if (pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm != TX_POWER_DBM_NOT_PRESENT_VALUE)
+                        {
+                            pOutBuffer->activityReportGetCnfUlMsg.txPowerDbmPresent = true;
+                        }
+                        pOutBuffer->activityReportGetCnfUlMsg.ulMcs = (uint8_t) **ppInBuffer;
+                        (*ppInBuffer)++;
+                        if (pOutBuffer->activityReportGetCnfUlMsg.ulMcs != MCS_NOT_PRESENT_VALUE)
+                        {
+                            pOutBuffer->activityReportGetCnfUlMsg.ulMcsPresent = true;
+                        }
+                        pOutBuffer->activityReportGetCnfUlMsg.dlMcs = (uint8_t) **ppInBuffer;
+                        (*ppInBuffer)++;
+                        if (pOutBuffer->activityReportGetCnfUlMsg.dlMcs != MCS_NOT_PRESENT_VALUE)
+                        {
+                            pOutBuffer->activityReportGetCnfUlMsg.dlMcsPresent = true;
+                        }
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;
@@ -4591,9 +4716,13 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "ActivityReportGetCnflMsg");
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logActivityReport(*ppLog, pLogSize, pOutBuffer->activityReportGetCnfUlMsg.totalTransmitMilliseconds,
-                                pOutBuffer->activityReportGetCnfUlMsg.totalReceiveMilliseconds,
+                        *ppLog += logActivityReport(*ppLog, pLogSize, pOutBuffer->activityReportGetCnfUlMsg.totalTransmitMilliseconds, pOutBuffer->activityReportGetCnfUlMsg.totalReceiveMilliseconds,
                                 pOutBuffer->activityReportGetCnfUlMsg.upTimeSeconds);
+                        *ppLog += logUlRf(*ppLog, pLogSize, pOutBuffer->activityReportGetCnfUlMsg.txPowerDbmPresent,
+                                pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm,
+                                pOutBuffer->activityReportGetCnfUlMsg.ulMcsPresent,
+                                pOutBuffer->activityReportGetCnfUlMsg.ulMcs);
+                        *ppLog += logDlRf(*ppLog, pLogSize, pOutBuffer->activityReportGetCnfUlMsg.dlMcsPresent, pOutBuffer->activityReportGetCnfUlMsg.dlMcs);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
@@ -4656,7 +4785,8 @@ void logMsg(const char * pFormat, ...)
     va_start(args, pFormat);
     vsnprintf(buffer, sizeof(buffer), pFormat, args);
     va_end(args);
-#ifdef WIN32  // Leave this out as I can't figure out to stop the C# app from garbage-collecting the pointer    if (mp_guiPrintToConsole)
+#ifdef WIN32  // Leave this out as I can't figure out to stop the C# app from garbage-collecting the pointer
+    if (mp_guiPrintToConsole)
     {
         (*mp_guiPrintToConsole) (buffer);
     }

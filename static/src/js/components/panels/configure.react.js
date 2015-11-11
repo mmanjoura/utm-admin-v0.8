@@ -4,6 +4,7 @@ var Link = require('react-router-component').Link;
 var Configure = React.createClass({
   render:function(){
     return (
+   
     	<div className="col-lg-4">
             <div  style={{height: 60, width: 200, marginTop: 100}}>
               <div className="panel-body">
