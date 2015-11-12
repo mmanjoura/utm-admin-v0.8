@@ -22659,6 +22659,8 @@ var Display = React.createClass({displayName: "Display",
    getInitialState: function(){   
 
       var data = {data:[
+
+
         ]}    
 
       return data;
@@ -22667,15 +22669,15 @@ var Display = React.createClass({displayName: "Display",
     pollState(function(data) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
       [
-        "Connection",
-        "LatestRssi",
-        "LatestRssiDisplay",
-        "LatestPowerState",
-        "LatestPowerStateDisplay",
-        "LatestDataVolume",
-        "InitIndUlMsg",
-        "LatestPollIndUlMsg",
-        "LatestTrafficReportIndUlMsg",
+        // "Connection",
+        // "LatestRssi",
+        // "LatestRssiDisplay",
+        // "LatestPowerState",
+        // "LatestPowerStateDisplay",
+        // "LatestDataVolume",
+        // "InitIndUlMsg",
+        // "LatestPollIndUlMsg",
+        // "LatestTrafficReportIndUlMsg",
         "LatestDisplayRow"
       ].map(function(property) {
         if (!data[property]) {
@@ -22689,29 +22691,9 @@ var Display = React.createClass({displayName: "Display",
         data.json = "";
       }
 
-      var currentUuIdkey = data["LatestDisplayRow"]["Uuid"];
+     
 
-      currentUuidsObject[data["LatestDisplayRow"]["Uuid"]] = data;
-      UuidsMap.set(data["LatestDisplayRow"]["Uuid"], data);
-
-
-
-      if (!(currentUuIdkey in currentUuidsObject)){
-        
-        if(currentUuIdkey !== undefined){
-              if(currentUuIdkey.length > 0){
-               // data["LatestDisplayRow"]["TotalMsg"] = data["LatestDisplayRow"]["TotalMsg"] + data["LatestDisplayRow"]["UTotalMsg"] + data["LatestDisplayRow"]["DTotalMsg"] 
-                console.log(data["LatestDisplayRow"]["TotalMsg"]);
-                currentUuidsObject[currentUuIdkey] = data;
-                UuidsMap.set(currentUuIdkey, data);
-              }
-        }
-    
-        
-      }
-
-     // arrData.push(data);
-      this.setState({data: UuidsMap})
+      this.setState({data: data})
 
     }.bind(this), 10000);
 
@@ -22722,7 +22704,7 @@ var Display = React.createClass({displayName: "Display",
             React.createElement("div", null, React.createElement("br", null), 
               React.createElement(Configure, null), 
               React.createElement(Summary, {data:  this.state.data}), 
-              React.createElement(Hint, null), 
+      
               React.createElement(DisplayRow, {data:  this.state.data})
             )
         );
@@ -22783,7 +22765,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
         var rows = [];
 
         this.props.data.forEach(function(uuid, i) {
-        if(uuid["Connection"]["Status"] !== undefined){   
+       
 
         rows.push(       
     
@@ -22795,37 +22777,35 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                         ), 
                         React.createElement("td", null, 
                           React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", uuid["LatestDisplayRow"]["Uuid"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", uuid["LatestDisplayRow"]["Mode"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", uuid["LatestDisplayRow"]["UnitName"]), 
-                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", uuid["LatestDisplayRow"]["ReportingInterval"]), 
-                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", uuid["LatestDisplayRow"]["HeartbeatSeconds"])
+                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", uuid["Uuid"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", uuid["Mode"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", uuid["UnitName"]), 
+                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", uuid["ReportingInterval"]), 
+                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", uuid["HeartbeatSeconds"])
                           )
                         ), 
                         React.createElement("td", null, 
                           React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["LatestDisplayRow"]["UTotalMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["LatestDisplayRow"]["UTotalBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["LatestDisplayRow"]["UlastMsgReceived"])
+                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["UTotalMsgs"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["UTotalBytes"]), 
+                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["UlastMsgReceived"])
                           )
                         ), 
                         React.createElement("td", {className: "center"}, 
-                          React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["LatestDisplayRow"]["DTotalMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["LatestDisplayRow"]["DTotalBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["LatestDisplayRow"]["DlastMsgReceived"])
-                          )
+                          React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["DTotalMsgs"]), 
+                          React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["DTotalBytes"]), 
+                          React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["DlastMsgReceived"])
                         ), 
-                        React.createElement("td", {className: "center"}, uuid["LatestDisplayRow"]["RSRP"]), 
+                        React.createElement("td", {className: "center"}, uuid["RSRP"]), 
                         React.createElement("td", {className: "center", style: {width: 105}}, 
-                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["LatestDisplayRow"]["DiskSpaceLeft"], React.createElement("br", null), 
-                          React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["LatestDisplayRow"]["BatteryLevel"]
+                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["DiskSpaceLeft"], React.createElement("br", null), 
+                          React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["BatteryLevel"]
                         )
                       )
 
                       );
 
-                }
+                
          
    
        });
@@ -23326,7 +23306,7 @@ var Summary = React.createClass({displayName: "Summary",
               this.props.data.forEach(function(uuid, i) {
 
 
-                          if(uuid["Connection"]["Status"] !== undefined){ 
+                  
 
                                       rows.push(  
                                     React.createElement("div", null, React.createElement("br", null), 
@@ -23337,9 +23317,9 @@ var Summary = React.createClass({displayName: "Summary",
                                         React.createElement("div", {className: "panel-body"}, 
                                           React.createElement("p", {style: {fontStyle: 'italic'}}, 
 
-                                           React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", uuid["LatestDisplayRow"]["TotalMsgs"] ), React.createElement("br", null), 
-                                            React.createElement("b", null, "Total Bytes:"), " ", uuid["LatestDisplayRow"]["TotalBytes"], React.createElement("br", null), 
-                                            React.createElement("b", null, "Last Msg:"), "    ", uuid["LatestDisplayRow"]["LastMsgReceived"], React.createElement("br", null)
+                                           React.createElement("b", null, "Total Msg:"), " ", React.createElement("span", {className: "resetColor"}, "  ", uuid["TotalMsgs"] ), React.createElement("br", null), 
+                                            React.createElement("b", null, "Total Bytes:"), " ", uuid["TotalBytes"], React.createElement("br", null), 
+                                            React.createElement("b", null, "Last Msg:"), "    ", uuid["LastMsgReceived"], React.createElement("br", null)
                                           )
                                         )
                                       )
@@ -23350,7 +23330,7 @@ var Summary = React.createClass({displayName: "Summary",
 
                      
                
-                  }
+               
 
 
            

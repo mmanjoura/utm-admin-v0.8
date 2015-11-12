@@ -7,7 +7,7 @@ var Summary = React.createClass({
               this.props.data.forEach(function(uuid, i) {
 
 
-                          if(uuid["Connection"]["Status"] !== undefined){ 
+                  
 
                                       rows.push(  
                                     <div><br />
@@ -18,9 +18,9 @@ var Summary = React.createClass({
                                         <div className="panel-body">
                                           <p style={{fontStyle: 'italic'}}>
 
-                                           <b>Total Msg:</b> <span className="resetColor">  {uuid["LatestDisplayRow"]["TotalMsgs"] }</span><br />
-                                            <b>Total Bytes:</b> {uuid["LatestDisplayRow"]["TotalBytes"] }<br />
-                                            <b>Last Msg:</b>    {uuid["LatestDisplayRow"]["LastMsgReceived"]}<br />
+                                           <b>Total Msg:</b> <span className="resetColor">  {uuid["TotalMsgs"] }</span><br />
+                                            <b>Total Bytes:</b> {uuid["TotalBytes"] }<br />
+                                            <b>Last Msg:</b>    {uuid["LastMsgReceived"]}<br />
                                           </p> 
                                         </div>
                                       </div>
@@ -31,7 +31,7 @@ var Summary = React.createClass({
 
                      
                
-                  }
+               
 
 
            

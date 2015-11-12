@@ -182,7 +182,7 @@ func decode(data []byte) {
 	// Holder for the extracted message
 	var inputBuffer C.union_UlMsgUnionTag_t
 	inputPointer := (*C.UlMsgUnion_t)(unsafe.Pointer(&inputBuffer))
-	Row.TotalMsgs = Row.TotalMsgs + uint64(len(data))
+	//Row.TotalMsgs = Row.TotalMsgs + uint64(len(data))
 	Row.UTotalMsgs = Row.UTotalMsgs + uint64(len(data))
 
 	// Loop over the messages in the datagram
@@ -197,7 +197,7 @@ func decode(data []byte) {
 
 	for {
 		decoderCount = decoderCount + 1
-		TotalMsgs = TotalMsgs + 1
+		//TotalMsgs = TotalMsgs + 1
 		now := time.Now()
 		Row.LastMsgReceived = &now
 
@@ -268,14 +268,14 @@ func decode(data []byte) {
 				DiskSpaceLeft: string(DiskSpaceLeft(value.diskSpaceLeft)),
 			}
 
-			Row.UTotalMsgs = TotalMsgs
+			//Row.UTotalMsgs = TotalMsgs
 			Row.Mode = ModeLookUp[string(ModeEnum(value.mode))]
 			Row.BatteryLevel = EnergyLeftLookUP[int(EnergyLeftEnum(value.energyLeft))]
 			Row.DiskSpaceLeft = DiskSpaceLookUP[int(DiskSpaceLeft(value.diskSpaceLeft))]
 
 			multipleRecords = append(multipleRecords, Row)
 
-			encodeAndEnqueueIntervalGetReq(Row.Uuid)
+			//encodeAndEnqueueIntervalGetReq(Row.Uuid)
 
 		case C.DECODE_RESULT_DEBUG_IND_UL_MSG:
 			rawData = C.getDebugIndUlMsg(inputBuffer)

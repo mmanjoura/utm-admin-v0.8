@@ -39,7 +39,7 @@ func operateStateTable() {
 		rssi := &RSSIData{}
 		state := LatestState{}
 		for msg := range cmds {
-			log.Printf("%s DATA TABLE COMMAND: %+v\n", logTag, msg)
+			log.Printf("%#v DATA TABLE COMMAND: %+v\n", logTag, msg)
 
 			switch value := msg.(type) {
 

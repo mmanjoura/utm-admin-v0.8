@@ -12,7 +12,7 @@ var DisplayRow = React.createClass({
         var rows = [];
 
         this.props.data.forEach(function(uuid, i) {
-        if(uuid["Connection"]["Status"] !== undefined){   
+       
 
         rows.push(       
     
@@ -24,37 +24,35 @@ var DisplayRow = React.createClass({
                         </td>
                         <td>
                           <ul className="SmallPadding">
-                            <li><b>Uuid:</b> {uuid["LatestDisplayRow"]["Uuid"]}</li>
-                            <li><b>Mode:</b> {uuid["LatestDisplayRow"]["Mode"]}</li>
-                            <li><b>Name:</b> {uuid["LatestDisplayRow"]["UnitName"]}</li>
-                             <li><b>Reporting Interval:</b> {uuid["LatestDisplayRow"]["ReportingInterval"]}</li>
-                              <li><b>Heart Beat:</b> {uuid["LatestDisplayRow"]["HeartbeatSeconds"]}</li>
+                            <li><b>Uuid:</b> {uuid["Uuid"]}</li>
+                            <li><b>Mode:</b> {uuid["Mode"]}</li>
+                            <li><b>Name:</b> {uuid["UnitName"]}</li>
+                             <li><b>Reporting Interval:</b> {uuid["ReportingInterval"]}</li>
+                              <li><b>Heart Beat:</b> {uuid["HeartbeatSeconds"]}</li>
                           </ul>   
                         </td>
                         <td>
                           <ul className="SmallPadding">
-                            <li><b>Total Msg:</b> {uuid["LatestDisplayRow"]["UTotalMsgs"]}</li>
-                            <li><b>Total Bytes:</b> {uuid["LatestDisplayRow"]["UTotalBytes"]}</li>
-                            <li><b>Last Msg RX:</b> {uuid["LatestDisplayRow"]["UlastMsgReceived"]}</li>
+                            <li><b>Total Msg:</b> {uuid["UTotalMsgs"]}</li>
+                            <li><b>Total Bytes:</b> {uuid["UTotalBytes"]}</li>
+                            <li><b>Last Msg RX:</b> {uuid["UlastMsgReceived"]}</li>
                           </ul> 
                         </td>
                         <td className="center">
-                          <ul className="SmallPadding">
-                            <li><b>Total Msg:</b> {uuid["LatestDisplayRow"]["DTotalMsgs"]}</li>
-                            <li><b>Total Bytes:</b> {uuid["LatestDisplayRow"]["DTotalBytes"]}</li>
-                            <li><b>Last Msg RX:</b> {uuid["LatestDisplayRow"]["DlastMsgReceived"]}</li>
-                          </ul>
+                          <li><b>Total Msg:</b> {uuid["DTotalMsgs"]}</li>
+                          <li><b>Total Bytes:</b> {uuid["DTotalBytes"]}</li>
+                          <li><b>Last Msg RX:</b> {uuid["DlastMsgReceived"]}</li>
                         </td>
-                        <td className="center">{uuid["LatestDisplayRow"]["RSRP"]}</td>
+                        <td className="center">{uuid["RSRP"]}</td>
                         <td className="center" style={{width: 105}}>
-                          <i className="fa fa-floppy-o" /> {uuid["LatestDisplayRow"]["DiskSpaceLeft"]}<br />
-                          <i className="fa fa-battery-full" /> {uuid["LatestDisplayRow"]["BatteryLevel"]}
+                          <i className="fa fa-floppy-o" /> {uuid["DiskSpaceLeft"]}<br />
+                          <i className="fa fa-battery-full" /> {uuid["BatteryLevel"]}
                         </td> 
                       </tr>
 
                       );
 
-                }
+                
          
    
        });

@@ -27,6 +27,8 @@ var ueGuid string
 var amqpCount int
 var displayRow = &DisplayRow{}
 
+//var UuidsMap = map[string]*DisplayRow{}
+
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
@@ -47,10 +49,19 @@ func getLatestState(response http.ResponseWriter, request *http.Request) *utilit
 	StateTableCmds <- &get
 	state := <-get
 
+	//Graddually group our units
+	AddUuidToMap(state.LatestDisplayRow)
+
+	//Recyle map with new state
+	UuidMap = RecycleMap(UuidMap, state)
+
+	//Copy unit into slice, for encoding
+	UuidSlice = ConvertMapToSlice(UuidMap)
+
 	// Send the requested data
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(response).Encode(state)
+	err := json.NewEncoder(response).Encode(UuidSlice)
 	if err != nil {
 		log.Printf("%s RECEIVED REST REQUEST %s BUT ATTEMPTING TO SERIALISE THE RESULT %s YIELDED ERROR %s\n", logTag, request.URL, spew.Sdump(state), err.Error())
 		return utilities.ServerError(err)
@@ -58,6 +69,37 @@ func getLatestState(response http.ResponseWriter, request *http.Request) *utilit
 	//log.Printf("%s Received rest request %s and responding with %s\n", logTag, request.URL, spew.Sdump(state))
 
 	return nil
+}
+
+func AddUuidToMap(row *DisplayRow) *utilities.Error {
+	if row != nil {
+		_, ok := UuidMap[row.Uuid]
+		if !ok {
+			UuidMap[row.Uuid] = row
+		}
+	}
+	return nil
+}
+func RecycleMap(oldMap map[string]*DisplayRow, newState LatestState) map[string]*DisplayRow {
+	if len(oldMap) > 3 {
+		_, ok := oldMap[newState.LatestDisplayRow.Uuid]
+		if ok {
+			//Delete old state
+			delete(oldMap, newState.LatestDisplayRow.Uuid)
+			//Add new state
+			oldMap[newState.LatestDisplayRow.Uuid] = newState.LatestDisplayRow
+		}
+	}
+
+	return oldMap
+}
+func ConvertMapToSlice(uidMap map[string]*DisplayRow) []*DisplayRow {
+	var sdisplay []*DisplayRow
+	for _, v := range uidMap {
+		sdisplay = append(sdisplay, v)
+	}
+
+	return sdisplay
 }
 
 //DownLink (DL) messages
@@ -138,10 +180,10 @@ func processAmqp(username, amqpAddress string) {
 						UplinkBytes:     uint64(len(value.Data)),
 					}
 					Row.UlastMsgReceived = &now
-					//Row.UTotalBytes = uint64(len(value.Data))
-					//Row.TotalBytes = uint64(len(value.Data))
-					// Row.TotalBytes = Row.UTotalBytes + Row.DTotalBytes
-					// Row.TotalMsgs = Row.UTotalMsgs + Row.DtotalMsgs
+					Row.UTotalBytes = uint64(len(value.Data))
+					Row.TotalMsgs = Row.TotalMsgs + uint64(len(value.Data))
+					Row.TotalBytes = Row.UTotalBytes + Row.DTotalBytes
+					Row.TotalMsgs = Row.UTotalMsgs + Row.DTotalMsgs + Row.TotalMsgs
 					connected = "CONNECTED"
 				}
 

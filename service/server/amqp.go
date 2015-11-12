@@ -15,6 +15,9 @@ import (
 	//"gopkg.in/mgo.v2/bson"
 )
 
+var UuidMap = make(map[string]*DisplayRow)
+var UuidSlice = make([]*DisplayRow, len(UuidMap))
+
 type AmqpMessage struct {
 	Device_uuid   string `bson:"device_uuid" json:"device_uuid"`
 	Endpoint_uuid int    `bson:"endpoint_uuid" json:"endpoint_uuid"`
@@ -193,15 +196,4 @@ func (q *Queue) Close() {
 	// FIXME: maybe dont need a quit chan... can get EOF info from AMQP chans somehow.
 	q.conn.Close()
 	close(q.quit)
-}
-
-func AddUuidToList(row *DisplayRow) {
-	for i, v := range RowsList {
-		if v.Uuid == row.Uuid {
-			//remove
-			RowsList = append(RowsList[:i], RowsList[i+1:]...)
-		}
-		//Add
-		RowsList = append(RowsList, row)
-	}
 }

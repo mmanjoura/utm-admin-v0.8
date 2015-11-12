@@ -25,6 +25,8 @@ var Display = React.createClass({
    getInitialState: function(){   
 
       var data = {data:[
+
+
         ]}    
 
       return data;
@@ -33,15 +35,15 @@ var Display = React.createClass({
     pollState(function(data) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
       [
-        "Connection",
-        "LatestRssi",
-        "LatestRssiDisplay",
-        "LatestPowerState",
-        "LatestPowerStateDisplay",
-        "LatestDataVolume",
-        "InitIndUlMsg",
-        "LatestPollIndUlMsg",
-        "LatestTrafficReportIndUlMsg",
+        // "Connection",
+        // "LatestRssi",
+        // "LatestRssiDisplay",
+        // "LatestPowerState",
+        // "LatestPowerStateDisplay",
+        // "LatestDataVolume",
+        // "InitIndUlMsg",
+        // "LatestPollIndUlMsg",
+        // "LatestTrafficReportIndUlMsg",
         "LatestDisplayRow"
       ].map(function(property) {
         if (!data[property]) {
@@ -55,29 +57,9 @@ var Display = React.createClass({
         data.json = "";
       }
 
-      var currentUuIdkey = data["LatestDisplayRow"]["Uuid"];
+     
 
-      currentUuidsObject[data["LatestDisplayRow"]["Uuid"]] = data;
-      UuidsMap.set(data["LatestDisplayRow"]["Uuid"], data);
-
-
-
-      if (!(currentUuIdkey in currentUuidsObject)){
-        
-        if(currentUuIdkey !== undefined){
-              if(currentUuIdkey.length > 0){
-               // data["LatestDisplayRow"]["TotalMsg"] = data["LatestDisplayRow"]["TotalMsg"] + data["LatestDisplayRow"]["UTotalMsg"] + data["LatestDisplayRow"]["DTotalMsg"] 
-                console.log(data["LatestDisplayRow"]["TotalMsg"]);
-                currentUuidsObject[currentUuIdkey] = data;
-                UuidsMap.set(currentUuIdkey, data);
-              }
-        }
-    
-        
-      }
-
-     // arrData.push(data);
-      this.setState({data: UuidsMap})
+      this.setState({data: data})
 
     }.bind(this), 10000);
 
@@ -87,8 +69,8 @@ var Display = React.createClass({
     return (
             <div><br />
               <Configure />
-              <Summary data = { this.state.data} />
-              <Hint />
+              <Summary data = { this.state.data} />  
+      
               <DisplayRow data = { this.state.data} />
             </div>
         );
