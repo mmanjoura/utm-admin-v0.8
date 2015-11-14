@@ -355,6 +355,9 @@ func decode(data []byte) {
 			fmt.Printf("%s DATA NOT BEING RECORDED = %+v\n", logTag, rawData)
 		} else {
 			fmt.Printf("%s ERROR: UNDECODABLE MESSGE RECEIVED %s\n", logTag, spew.Sdump(inputBuffer))
+
+			//if you get here, break from this loop;
+			break
 		}
 
 	}

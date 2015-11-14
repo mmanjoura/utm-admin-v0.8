@@ -184,6 +184,8 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 					log.Printf("%s GOT %+v\n", logTag, string(msg.Body))
 				} else {
 					log.Printf("%s RECEIVED %+v WHICH IS UNDECODABLE: %s\n", logTag, string(msg.Body), err.Error())
+					//If you get here break and start again.
+					break
 				}
 			}
 

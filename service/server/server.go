@@ -11,13 +11,13 @@ import (
 	"net/http"
 	//"os"
 
-	"time"
-
 	"github.com/codegangsta/negroni"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/goincremental/negroni-sessions"
 	"github.com/goincremental/negroni-sessions/cookiestore"
 	"github.com/mmanjoura/utm-admin-v0.8/service/routes"
+	//"sort"
+	"time"
 )
 
 var logTag string = "UTM-API"
