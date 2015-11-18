@@ -67,6 +67,7 @@ import (
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
 	"log"
+	"reflect"
 	"time"
 	"unsafe"
 )
@@ -179,6 +180,10 @@ const (
 
 func decode(data []byte) {
 
+	// var xmlBuffer [8192]byte
+	// xmlData := (**C.char)(unsafe.Pointer(&xmlBuffer[0]))
+	// xmlDataSize := (C.uint32_t)(unsafe.Sizeof(xmlBuffer))
+
 	// Holder for the extracted message
 	var inputBuffer C.union_UlMsgUnionTag_t
 	inputPointer := (*C.UlMsgUnion_t)(unsafe.Pointer(&inputBuffer))
@@ -213,6 +218,11 @@ func decode(data []byte) {
 		}
 
 		result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, nil, nil)
+		//result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, xmlData, &xmlDataSize)
+
+		// fmt.Printf("\n%s -----+++ THE XML DATA IS ++----- \n\n %s\n\n", logTag, spew.Sdump(xmlData))
+		// fmt.Printf("\n%s -----+++ THE XML DATA IS ++----- \n\n %#v\n\n", logTag, xmlData)
+
 		fmt.Printf("%s DECODE RECEIVED UPLINK MESSAGE %+v \n\n -----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
 
 		// Extract any data to be recorded; the C symbols are not available outside
@@ -453,4 +463,22 @@ func encodeAndEnqueueIntervalGetReq(ueGuid string) error {
 	}
 
 	return errors.New("NO DOWNLINKMESSAGES CHANNEL AVAILABLE TO ENQUEUE THE ENCODED MESSAGE")
+}
+
+func encodePingReqMsg(ueGuid string) error {
+
+	if downlinkMessages != nil {
+		// Encode the data structure into the output buffer
+		//cbytes := C.encodePingReqMsg(nil, nil, xmLData, 8192)
+
+		//xmlData should contain xml Data
+
+	}
+
+	return nil
+
+}
+
+func ElemSize(container interface{}) uintptr {
+	return reflect.TypeOf(container).Elem().Size()
 }

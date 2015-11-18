@@ -16,7 +16,7 @@ import (
 	"github.com/goincremental/negroni-sessions"
 	"github.com/goincremental/negroni-sessions/cookiestore"
 	"github.com/mmanjoura/utm-admin-v0.8/service/routes"
-	//"sort"
+	"sort"
 	"time"
 )
 
@@ -57,6 +57,8 @@ func getLatestState(response http.ResponseWriter, request *http.Request) *utilit
 
 	//Copy unit into slice, for encoding
 	UuidSlice = ConvertMapToSlice(UuidMap)
+
+	sort.Sort(ByUuid(UuidSlice))
 
 	// Send the requested data
 	response.Header().Set("Content-Type", "application/json")
@@ -244,3 +246,10 @@ func Run() {
 	n.Run(port)
 
 }
+
+//Given the sorting capability to our slice of uuids
+type ByUuid []*DisplayRow
+
+func (u ByUuid) Len() int           { return len(u) }
+func (u ByUuid) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
+func (u ByUuid) Less(i, j int) bool { return u[i].Uuid < u[j].Uuid }

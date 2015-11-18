@@ -57,7 +57,7 @@ var Display = React.createClass({
         data.json = "";
       }
 
-     
+     console.log(data);
 
       this.setState({data: data})
 

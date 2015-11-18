@@ -22691,7 +22691,7 @@ var Display = React.createClass({displayName: "Display",
         data.json = "";
       }
 
-     
+     console.log(data);
 
       this.setState({data: data})
 
@@ -23339,7 +23339,7 @@ var Summary = React.createClass({displayName: "Summary",
           return (
 
               React.createElement("div", null, 
-                rows[1]
+                rows[0]
              )
           );
       }
