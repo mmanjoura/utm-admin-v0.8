@@ -66,8 +66,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/mmanjoura/utm-admin-v0.8/service/utilities"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"log"
-	"reflect"
 	"time"
 	"unsafe"
 )
@@ -98,6 +100,13 @@ var ulDecodeTypeDisplay map[int]string = map[int]string{
 	C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_IND_UL_MSG:          "DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_IND_UL_MSG",
 	C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_GET_CNF_UL_MSG:      "DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_GET_CNF_UL_MSG",
 	C.DECODE_RESULT_DEBUG_IND_UL_MSG:                             "DECODE_RESULT_DEBUG_IND_UL_MSG",
+}
+
+type UtmXml struct {
+	ID      bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	Date    time.Time     `bson:"date" json:"date"`
+	Uid     string        `bson:"uid" json:"uid"`
+	XmlData [8192]C.char  `bson:"XmlData" json:"XmlData"`
 }
 
 type DiskSpaceLeft uint32
@@ -180,9 +189,13 @@ const (
 
 func decode(data []byte) {
 
-	// var xmlBuffer [8192]byte
-	// xmlData := (**C.char)(unsafe.Pointer(&xmlBuffer[0]))
-	// xmlDataSize := (C.uint32_t)(unsafe.Sizeof(xmlBuffer))
+	var xmlBuffer [8192]C.char
+	// A place to put the XML output from the decoder
+	// pXmlBuffer := (*C.char)(unsafe.Pointer(&(xmlBuffer[0])))
+	// ppXmlBuffer := (**C.char)(unsafe.Pointer(&pXmlBuffer))
+
+	// xmlBufferLen := (C.uint32_t)(len(xmlBuffer))
+	// pXmlBufferLen := (*C.uint32_t)(unsafe.Pointer(&xmlBufferLen))
 
 	// Holder for the extracted message
 	var inputBuffer C.union_UlMsgUnionTag_t
@@ -217,11 +230,13 @@ func decode(data []byte) {
 			break
 		}
 
+		//result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, ppXmlBuffer, pXmlBufferLen)
 		result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, nil, nil)
-		//result := C.decodeUlMsg(nextPointerPointer, remaining, inputPointer, xmlData, &xmlDataSize)
 
-		// fmt.Printf("\n%s -----+++ THE XML DATA IS ++----- \n\n %s\n\n", logTag, spew.Sdump(xmlData))
-		// fmt.Printf("\n%s -----+++ THE XML DATA IS ++----- \n\n %#v\n\n", logTag, xmlData)
+		//Store XmlData in MongoDB
+		XmlDataStore(xmlBuffer)
+
+		fmt.Printf("\n%s -----+++ THE XML DATA IS ++----- \n\n %s\n\n", logTag, spew.Sdump(xmlBuffer))
 
 		fmt.Printf("%s DECODE RECEIVED UPLINK MESSAGE %+v \n\n -----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
 
@@ -479,6 +494,27 @@ func encodePingReqMsg(ueGuid string) error {
 
 }
 
-func ElemSize(container interface{}) uintptr {
-	return reflect.TypeOf(container).Elem().Size()
+func XmlDataStore(xmlData [8192]C.char) {
+
+	//TODO: an attempt to store only xml
+	//and ignore the rest of the array
+	for i := 0; i < len(xmlData); i++ {
+		if xmlData[i] == 0 {
+			break
+		}
+	}
+
+	utmXml := utilities.UtmXml{}
+	utmXml.ID = bson.NewObjectId()
+	utmXml.Date = time.Now()
+	utmXml.Uid = Row.Uuid
+	//utmXml.XmlData = xmlData
+
+	xml_Session, err := mgo.Dial("127.0.0.1:27017")
+	defer xml_Session.Close()
+	if err == nil {
+		xml_collection := xml_Session.DB("utm-db").C("xmLData")
+		xml_collection.Insert(&utmXml)
+	}
+
 }

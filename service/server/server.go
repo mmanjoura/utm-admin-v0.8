@@ -6,16 +6,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/brettlangdon/forge"
+	//"github.com/gorilla/mux"
 	"github.com/mmanjoura/utm-admin-v0.8/service/utilities"
 	"log"
 	"net/http"
 	//"os"
-
 	"github.com/codegangsta/negroni"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/goincremental/negroni-sessions"
 	"github.com/goincremental/negroni-sessions/cookiestore"
+	"github.com/mmanjoura/utm-admin-v0.8/service/models"
 	"github.com/mmanjoura/utm-admin-v0.8/service/routes"
+	"github.com/mmanjoura/utm-admin-v0.8/service/system"
 	"sort"
 	"time"
 )
@@ -23,6 +25,7 @@ import (
 var logTag string = "UTM-API"
 var listenAddress string
 var downlinkMessages chan<- AmqpMessage
+
 var ueGuid string
 var amqpCount int
 var displayRow = &DisplayRow{}
@@ -34,6 +37,46 @@ func failOnError(err error, msg string) {
 		log.Fatalf("%s: %s", msg, err)
 		panic(fmt.Sprintf("%s: %s", msg, err))
 	}
+}
+
+func loginHandler(response http.ResponseWriter, request *http.Request) {
+
+	email := request.FormValue("email")
+	password := request.FormValue("password")
+	//session := sessions.GetSession(request)
+
+	db := utilities.GetDB(request)
+	user := new(models.User)
+	err := user.Authenticate(db, email, password)
+	if err == nil {
+		session := sessions.GetSession(request)
+		session.Set("user_id", user.ID.Hex())
+		session.Set("user_company", user.Company)
+		session.Set("user_email", user.Email)
+		//fmt.Fprintf(response, "User %s success!", session.Get("user_email"))
+		http.Redirect(response, request, "/", 202)
+
+	} else {
+		http.Redirect(response, request, "/login", 302)
+	}
+
+}
+
+func registerHandler(response http.ResponseWriter, request *http.Request) {
+
+	company := request.FormValue("company_name")
+	firstName := request.FormValue("user_firstName")
+	lastName := request.FormValue("user_lastName")
+	email := request.FormValue("email")
+	password := request.FormValue("password")
+
+	db := utilities.GetDB(request)
+	user := new(models.User)
+
+	user.NewUser(db, company, firstName, lastName, email, password)
+	//fmt.Fprintf(response, "User %s Created Successfullyss!", firstName)
+	http.Redirect(response, request, "/login", 302)
+
 }
 
 func getLatestState(response http.ResponseWriter, request *http.Request) *utilities.Error {
@@ -59,6 +102,17 @@ func getLatestState(response http.ResponseWriter, request *http.Request) *utilit
 	UuidSlice = ConvertMapToSlice(UuidMap)
 
 	sort.Sort(ByUuid(UuidSlice))
+
+	//Store our message in MongoDB
+	db := utilities.GetDB(request)
+	UtmMessages := models.UtmMsgs{}
+
+	if state.LatestDisplayRow != nil {
+		out, err := json.Marshal(state.LatestDisplayRow)
+		if err == nil {
+			UtmMessages.Insert(db, state.LatestDisplayRow.Uuid, string(out))
+		}
+	}
 
 	// Send the requested data
 	response.Header().Set("Content-Type", "application/json")
@@ -233,6 +287,11 @@ func Run() {
 	store := cookiestore.New([]byte("secretkey789"))
 	router := routes.LoadRoutes()
 
+	// router.Handle("/", utilities.Handler(login))
+	//router.Handle("/login", utilities.Handler(login))
+	router.HandleFunc("/register", registerHandler)
+	router.HandleFunc("/login", loginHandler)
+	//router.Handle("/register", utilities.Handler(register))
 	router.Handle("/latestState", utilities.Handler(getLatestState))
 	router.Handle("/reportingInterval", utilities.Handler(setReportingInterval))
 
@@ -240,7 +299,7 @@ func Run() {
 	static := negroni.NewStatic(http.Dir("static"))
 	static.Prefix = "/static"
 	n.Use(static)
-	//n.Use(negroni.HandlerFunc(system.MgoMiddleware))
+	n.Use(negroni.HandlerFunc(system.MgoMiddleware))
 	n.Use(sessions.Sessions("global_session_store", store))
 	n.UseHandler(router)
 	n.Run(port)

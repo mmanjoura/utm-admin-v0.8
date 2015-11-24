@@ -10,10 +10,10 @@ type UtmXml struct {
 	ID      bson.ObjectId `bson:"_id,omitempty" json:"id"`
 	Date    time.Time     `bson:"date" json:"date"`
 	Uid     string        `bson:"uid" json:"uid"`
-	XmlData []byte        `bson:"XmlData" json:"XmlData"`
+	XmlData string        `bson:"XmlData" json:"XmlData"`
 }
 
-func (u *UtmXml) Insert(db *mgo.Database, xmlData []byte, uuid string) {
+func (u *UtmXml) Insert(db *mgo.Database, xmlData string, uuid string) {
 
 	var utmXml = UtmXml{}
 

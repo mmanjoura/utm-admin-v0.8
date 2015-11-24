@@ -22425,14 +22425,14 @@ var Header = React.createClass({displayName: "Header",
               React.createElement("i", {className: "fa fa-user fa-fw"}), " User ", React.createElement("i", {className: "fa fa-caret-down"})
             ), 
             React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
-              React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " Add User")
+              React.createElement("li", null, React.createElement(Link, {href: "#/register"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " Add User")
               ), 
               React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " User Profile")
               ), 
               React.createElement("li", {className: "divider"}), 
-              React.createElement("li", null, React.createElement("a", {href: "login.html"}, React.createElement("i", {className: "fa fa-sign-out fa-fw"}), " Logout")
+              React.createElement("li", null, React.createElement(Link, {href: "#/login"}, React.createElement("i", {className: "fa fa-sign-out fa-fw"}), " Logout")
               ), 
-              React.createElement("li", null, React.createElement("a", {href: "login.html"}, React.createElement("i", {className: "fa fa-sign-in fa-fw"}), " Login")
+              React.createElement("li", null, React.createElement(Link, {href: "#/login"}, React.createElement("i", {className: "fa fa-sign-in fa-fw"}), " Login")
               )
             )
             /* /.dropdown-user */
@@ -22512,6 +22512,8 @@ var Router = require('react-router-component');
 var Template = require('./app-template.js');
 var Display = require('./display/display.react');
 var Mode = require('./mode/mode.react');
+var Login = require('./user/login.react');
+var Register = require('./user/register.react');
 
 var Locations = Router.Locations;
 var Location  = Router.Location;
@@ -22522,7 +22524,9 @@ var App = React.createClass({displayName: "App",
       React.createElement(Template, null, 
         React.createElement(Locations, null, 
           React.createElement(Location, {path: "/", handler: Display}), 
-          React.createElement(Location, {path: "/mode", handler: Mode})
+          React.createElement(Location, {path: "/mode", handler: Mode}), 
+          React.createElement(Location, {path: "#/login", handler: Login}), 
+          React.createElement(Location, {path: "#/register", handler: Register})
         )
       )
     );
@@ -22530,7 +22534,7 @@ var App = React.createClass({displayName: "App",
 });
 
 module.exports = App;
-},{"./app-template.js":190,"./display/display.react":197,"./mode/mode.react":199,"react":188,"react-router-component":8}],192:[function(require,module,exports){
+},{"./app-template.js":190,"./display/display.react":197,"./mode/mode.react":199,"./user/login.react":204,"./user/register.react":205,"react":188,"react-router-component":8}],192:[function(require,module,exports){
 var React = require('react');
 
 var Apply = React.createClass({displayName: "Apply",
@@ -22669,15 +22673,6 @@ var Display = React.createClass({displayName: "Display",
     pollState(function(data) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
       [
-        // "Connection",
-        // "LatestRssi",
-        // "LatestRssiDisplay",
-        // "LatestPowerState",
-        // "LatestPowerStateDisplay",
-        // "LatestDataVolume",
-        // "InitIndUlMsg",
-        // "LatestPollIndUlMsg",
-        // "LatestTrafficReportIndUlMsg",
         "LatestDisplayRow"
       ].map(function(property) {
         if (!data[property]) {
@@ -22750,7 +22745,7 @@ Object.size = function(obj) {
 };
 
 module.exports = Display;
-},{"../../mixins/StoreWatchMixin":207,"../../stores/app-store.js":208,"../panels/configure.react":200,"../panels/hint.react":201,"../panels/measurements.react":202,"../panels/summary.react":203,"./displayRow.react":198,"react":188,"react-router-component":8}],198:[function(require,module,exports){
+},{"../../mixins/StoreWatchMixin":209,"../../stores/app-store.js":210,"../panels/configure.react":200,"../panels/hint.react":201,"../panels/measurements.react":202,"../panels/summary.react":203,"./displayRow.react":198,"react":188,"react-router-component":8}],198:[function(require,module,exports){
 /**
  * Copyright (c) 2014, U-blox.
  * All rights reserved.
@@ -23348,15 +23343,111 @@ var Summary = React.createClass({displayName: "Summary",
 module.exports = Summary;
 
 },{"react":188}],204:[function(require,module,exports){
+var React = require('react');
+var Link = require('react-router-component').Link;
+
+var Login = React.createClass({displayName: "Login",
+  render:function(){
+    return (   
+          React.createElement("div", {className: "row centered-form"}, React.createElement("br", null), React.createElement("br", null), React.createElement("br", null), 
+              React.createElement("div", {className: "col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
+                      React.createElement("div", {className: "panel-heading"}, 
+                          React.createElement("h4", {className: "panel-title text-left"}, "Please Sign In")
+                      ), 
+                      React.createElement("div", {className: "panel-body"}, 
+                          React.createElement("form", {role: "form", action: "/login", method: "post"}, 
+                            React.createElement("div", {className: "form-group"}, 
+                                  React.createElement("input", {type: "email", name: "email", id: "email", className: "form-control input-sm", placeholder: "Email Address", required: true, autofocus: true})
+                              ), 
+                              React.createElement("div", {className: "form-group"}, 
+                                  React.createElement("input", {type: "password", name: "user_password", id: "user_password", className: "form-control input-sm", placeholder: "User password", required: true})
+
+                              ), 
+                              React.createElement("input", {type: "submit", value: "Login", className: "btn btn-info"})
+                          )
+                      )
+                  )
+              )
+          )
+    );
+  }
+});
+
+module.exports = Login;
+
+},{"react":188,"react-router-component":8}],205:[function(require,module,exports){
+var React = require('react');
+var Link = require('react-router-component').Link;
+
+
+
+var Register = React.createClass({displayName: "Register",
+
+
+  render:function(){
+    return (
+          React.createElement("div", {className: "row centered-form"}, React.createElement("br", null), React.createElement("br", null), React.createElement("br", null), 
+              React.createElement("div", {className: "col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4"}, 
+                  React.createElement("div", {className: "panel panel-default"}, 
+                      React.createElement("div", {className: "panel-heading"}, 
+                          React.createElement("h4", {className: "panel-title text-left"}, "Create User")
+                      ), 
+                        React.createElement("div", {className: "panel-body"}, 
+                            React.createElement("form", {role: "form", action: "/register", method: "post"}, 
+                              React.createElement("div", {className: "form-group"}, 
+                                    React.createElement("input", {type: "text", name: "company_name", id: "company_name", className: "form-control input-sm", placeholder: "Company Name", required: true})
+                                ), 
+                                React.createElement("div", {className: "form-group"}, 
+                                    React.createElement("input", {type: "text", name: "user_firstName", id: "user_firstName", className: "form-control input-sm", placeholder: "First Name", required: true})
+                                ), 
+                                React.createElement("div", {className: "form-group"}, 
+                                    React.createElement("input", {type: "text", name: "user_lastName", id: "user_lastName", className: "form-control input-sm", placeholder: "Last Name", required: true})
+                                ), 
+                             
+                            
+
+                                React.createElement("div", {className: "form-group"}, 
+                                    React.createElement("input", {type: "email", "ng-model": "user.email", name: "email", id: "email", className: "form-control input-sm", placeholder: "Email Address", required: true})
+                                ), 
+
+                                
+                            
+                                        React.createElement("div", {className: "form-group"}, 
+                                            React.createElement("input", {type: "password", "ng-model": "user.password", name: "password", id: "password", className: "form-control input-sm", placeholder: "Password", required: true})
+                                        ), 
+                                   
+                                  
+                                        React.createElement("div", {className: "form-group"}, 
+                                            React.createElement("input", {type: "password", name: "password_confirmation", id: "password_confirmation", className: "form-control input-sm", placeholder: "Confirm Password", required: true})
+                                        ), 
+                                   
+                             
+
+                                React.createElement("input", {type: "Submit", value: "Submit", className: "btn btn-info"})
+                            )
+                        )
+                    )
+   
+            )
+        )
+    );
+  }
+});
+
+module.exports = Register;
+
+},{"react":188,"react-router-component":8}],206:[function(require,module,exports){
 module.exports = {
   SET_COMMISSIONING: 'SET_COMMISSIONING',
   SET_TRAFFIC_TEST: 'SET_TRAFFIC_TEST',
   SET_STANDARD_TRX: 'SET_STANDARD_TRX',
   SET_HEARTBEAT: 'SET_HEARTBEAT',
   SET_REPORTING_INTERVAL: 'SET_REPORTING_INTERVAL',
-  REBOOT: 'REBOOT'
+  REBOOT: 'REBOOT',
+  ADD_USER: 'ADD_USER'
 };
-},{}],205:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('react/lib/Object.assign');
 
@@ -23371,12 +23462,12 @@ var AppDispatcher = assign(new Dispatcher(), {
 });
 
 module.exports = AppDispatcher;
-},{"flux":3,"react/lib/Object.assign":56}],206:[function(require,module,exports){
+},{"flux":3,"react/lib/Object.assign":56}],208:[function(require,module,exports){
 var App = require('./components/app');
 var React = require('react');
 
 React.render(React.createElement(App, null), document.getElementById('main'));
-},{"./components/app":191,"react":188}],207:[function(require,module,exports){
+},{"./components/app":191,"react":188}],209:[function(require,module,exports){
 var React = require('react');
 var AppStore = require('../stores/app-store');
 
@@ -23398,7 +23489,7 @@ var StoreWatchMixin = function(cb){
 }
 
 module.exports = StoreWatchMixin;
-},{"../stores/app-store":208,"react":188}],208:[function(require,module,exports){
+},{"../stores/app-store":210,"react":188}],210:[function(require,module,exports){
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
 var assign = require('react/lib/Object.assign');
@@ -23418,6 +23509,29 @@ function _setHeartBeat(uuid){
 function _setReportingInterval(uuid){
 }
 function _reboot(uuid){
+}
+function addUser(company, firstName, lastName, email, password) {
+  obj = {};
+  obj.company = company;
+  obj.firstName = firstName;
+  obj.lastName = lastName;
+  obj.email = email;
+  obj.password = password;
+
+  $.ajax({
+        url: 'http://localhost:3000/register',
+        dataType: 'json',
+        method: 'put',
+        async: false,
+        data: obj,
+        success: function(data) {
+          return  
+        },
+        error: function(xhr, status, err) {
+          console.error('/', status, err.toString());
+        }
+    });
+  return
 }
 
   var AppStore = assign(EventEmitter.prototype, {
@@ -23470,4 +23584,4 @@ function _reboot(uuid){
 })
 
 module.exports = AppStore;
-},{"../constants/app-constants":204,"../dispatchers/app-dispatcher":205,"events":1,"react/lib/Object.assign":56}]},{},[206]);
+},{"../constants/app-constants":206,"../dispatchers/app-dispatcher":207,"events":1,"react/lib/Object.assign":56}]},{},[208]);

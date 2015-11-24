@@ -15,16 +15,14 @@ type User struct {
 	Company   string        `bson:"company" json:"company"`
 	FirstName string        `bson:"firstName" json:"firstName"`
 	LastName  string        `bson:"lastName" json:"lastName"`
-	UserName  string        `bson:"userName" json:"userName"`
 	Email     string        `bson:"email" json:"email"`
 	Password  string        `bson:"password" json:"password"`
 }
 
-func (u *User) NewUser(db *mgo.Database, company, firstName, lastName, userName, email, password string) {
+func (u *User) NewUser(db *mgo.Database, company, firstName, lastName, email, password string) {
 	u.Company = company
 	u.FirstName = firstName
 	u.LastName = lastName
-	u.UserName = userName
 	u.Email = email
 	u.ID = bson.NewObjectId()
 	h := md5.New()
@@ -53,7 +51,7 @@ func (u *User) GetCompanyUsers(db *mgo.Database, company string) (users []User) 
 	return users
 }
 
-func (u *User) GetUserUuids(db *mgo.Database, company string) (uuids []Uuid) {
+func (u *User) GetUserUuids(db *mgo.Database, company string) (uuids []UtmMsgs) {
 
 	err := db.C("uuids").Find(bson.M{"company": company}).Limit(50).All(&uuids)
 

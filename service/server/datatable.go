@@ -109,6 +109,7 @@ func operateStateTable() {
 			default:
 				log.Printf("%s UNRECOGNISED DATA TABLE COMMAND; IGNORING: %s\n", logTag, spew.Sdump(msg))
 			}
+
 		}
 
 		log.Printf("%s DATA TABLE COMMAND CHANNEL CLOSED; STOPPING\n", logTag)
