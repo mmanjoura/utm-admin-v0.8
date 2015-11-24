@@ -43,21 +43,18 @@ func loginHandler(response http.ResponseWriter, request *http.Request) {
 
 	email := request.FormValue("email")
 	password := request.FormValue("password")
-	//session := sessions.GetSession(request)
+	session := sessions.GetSession(request)
 
 	db := utilities.GetDB(request)
 	user := new(models.User)
 	err := user.Authenticate(db, email, password)
 	if err == nil {
-		session := sessions.GetSession(request)
 		session.Set("user_id", user.ID.Hex())
 		session.Set("user_company", user.Company)
 		session.Set("user_email", user.Email)
 		//fmt.Fprintf(response, "User %s success!", session.Get("user_email"))
-		http.Redirect(response, request, "/", 202)
+		http.Redirect(response, request, "/", 302)
 
-	} else {
-		http.Redirect(response, request, "/login", 302)
 	}
 
 }
